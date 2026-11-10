@@ -1,0 +1,1563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WasteXchange</title>
+<meta name="description" content="WasteXchange matches chemical plants' surplus with local businesses that can use it, and handles the paperwork and logistics.">
+<link rel="icon" type="image/png" href="logo.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Grey colorway with logo green. Layout: process-flow marketplace. Sticky nav, single column marketing views, three-pane deal room. */
+:root{
+  --bg:#D5D9DA; --surface:#E8EAEB; --sunk:#C8CDCF; --head:#C2C7C9; --ink:#1B2023; --muted:#4A5357; --line:#B4BBBE;
+  --s-xchg:#4A8A1F; --s-disp:#4A63C0;
+  --accent:#72B13C; --accent-text:#3D7419; --accent-ink:#13200A; --accent-soft:#CFDFC2;
+  --signal:#8F5200; --signal-soft:#EAD9BD; --danger:#9C3022; --danger-soft:#EBD0CB; --ok:#2C6E2F; --ok-soft:#CCE0CD;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#25292B; --surface:#2F3437; --sunk:#1F2325; --head:#1A1D1F; --ink:#E6E9EA; --muted:#A4ACAF; --line:#434A4E;
+  --s-xchg:#5E9F2B; --s-disp:#6F87DB;
+  --accent:#7DBF47; --accent-text:#93D25E; --accent-ink:#12200A; --accent-soft:#36432D;
+  --signal:#E8A447; --signal-soft:#45361E; --danger:#EC8070; --danger-soft:#4A2A25; --ok:#7CCB86; --ok-soft:#264030;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#25292B; --surface:#2F3437; --sunk:#1F2325; --head:#1A1D1F; --ink:#E6E9EA; --muted:#A4ACAF; --line:#434A4E;
+  --s-xchg:#5E9F2B; --s-disp:#6F87DB;
+  --accent:#7DBF47; --accent-text:#93D25E; --accent-ink:#12200A; --accent-soft:#36432D;
+  --signal:#E8A447; --signal-soft:#45361E; --danger:#EC8070; --danger-soft:#4A2A25; --ok:#7CCB86; --ok-soft:#264030;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--head)}
+a{color:var(--accent-text)}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;line-height:1.08;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5.4vw,60px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,3.2vw,36px);font-weight:750}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* nav */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:18px;min-height:60px;flex-wrap:wrap;padding-block:8px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:22px;font-stretch:90%;letter-spacing:-.01em;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:8px}
+.brand img{height:36px;width:auto;display:block}
+nav.links{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.links a{text-decoration:none;color:var(--muted);font-weight:500;padding:7px 11px;border-radius:var(--r);display:flex;align-items:center;gap:6px}
+nav.links a:hover{color:var(--ink);background:var(--bg)}
+nav.links a[aria-current="page"]{color:var(--ink);background:var(--bg);box-shadow:inset 0 -2px 0 var(--accent)}
+.count{font-family:var(--f-mono);font-size:11px;background:var(--accent);color:var(--accent-ink);border-radius:9px;padding:0 6px;line-height:18px}
+.banner{background:var(--signal-soft);color:var(--ink);border-bottom:1px solid var(--line);font-size:14px}
+.banner .wrap{padding-block:9px}
+
+/* buttons, inputs */
+.btn{font:inherit;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:var(--r);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;line-height:1.2}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--sunk)}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.danger{background:transparent;color:var(--danger);border-color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--ink)}
+label .hint{font-weight:400;color:var(--muted);font-size:12px}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px 10px;width:100%;min-width:0}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{flex-direction:row;align-items:center;gap:7px;font-weight:500;border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;background:var(--surface);cursor:pointer}
+.checks input{width:auto}
+
+/* views */
+main{padding-block:0 64px}
+section.view{display:block}
+.hero{padding-block:56px 40px;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.hero > *{min-width:0}
+.hero p.lede{font-size:18px;color:var(--muted);max-width:56ch;margin-top:18px}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:10px}
+.flow .node{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;background:var(--bg)}
+.flow .node.hub{background:var(--accent-soft);border-color:var(--accent)}
+.flow .node h4{margin:0 0 3px;font-family:var(--f-display);font-size:16px;font-stretch:90%}
+.flow .node p{font-size:13px;color:var(--muted)}
+.flow .pipe{height:22px;display:flex;justify-content:center}
+.flow .pipe span{width:2px;background:repeating-linear-gradient(var(--accent) 0 5px,transparent 5px 9px)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-family:var(--f-mono);font-size:11.5px;border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:2px 7px;color:var(--ink);white-space:nowrap}
+.chip.accent{border-color:var(--accent);color:var(--accent-text)}
+.chip.signal{background:var(--signal-soft);border-color:transparent;color:var(--signal)}
+.chip.danger{background:var(--danger-soft);border-color:transparent;color:var(--danger)}
+.chip.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+
+.band{padding-block:56px;border-top:1px solid var(--line)}
+.band-head{display:grid;gap:10px;margin-bottom:28px;max-width:62ch}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.steps > div{padding:18px 16px;border-right:1px solid var(--line);min-width:0}
+.steps > div:last-child{border-right:0}
+.steps .n{font-family:var(--f-mono);font-size:12px;color:var(--accent-text);font-weight:500}
+.steps h3{margin:6px 0 6px;font-size:17px}
+.steps p{font-size:14px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.two > *{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px}
+.ticks{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:9px}
+.ticks li{padding-left:22px;position:relative}
+.ticks li::before{content:"";position:absolute;left:2px;top:.55em;width:9px;height:9px;border:2px solid var(--accent);border-radius:2px}
+.criteria{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.criteria > div{background:var(--surface);padding:18px;min-width:0}
+.criteria .kind{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.criteria .kind.gate{color:var(--danger)}
+.criteria .kind.weight{color:var(--accent-text)}
+.criteria h3{font-size:17px;margin:6px 0}
+.criteria p{font-size:14px;color:var(--muted)}
+.fee{display:grid;grid-template-columns:1fr 1.2fr;gap:20px;align-items:stretch}
+.fee > *{min-width:0}
+.bigfig{font-family:var(--f-display);font-weight:800;font-size:56px;font-stretch:85%;line-height:1}
+.ledger{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ledger td{padding:9px 0;border-bottom:1px solid var(--line)}
+.ledger td:last-child{text-align:right;font-family:var(--f-mono)}
+.ledger tr.total td{font-weight:600;border-bottom:0;padding-top:12px}
+.integr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.integr > div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.integr h3{font-size:16px;margin:8px 0 4px}
+.integr p{font-size:13.5px;color:var(--muted)}
+pre.schema{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:16px;font-family:var(--f-mono);font-size:13px;overflow-x:auto;margin:16px 0 0;line-height:1.6}
+pre.schema .k{color:var(--accent-text)}
+pre.schema .t{color:var(--muted)}
+
+/* market */
+.page-head{padding-block:36px 22px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.page-head > div{display:grid;gap:8px;max-width:64ch}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cols > *{min-width:0}
+.col-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
+.cards{display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:8px;min-width:0}
+.card.mine{border-left:3px solid var(--accent)}
+.card .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.card h4{margin:0;font-size:16px;font-weight:600}
+.card .sub{font-size:13px;color:var(--muted)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px 14px;font-size:13px}
+.specs dt{color:var(--muted);font-size:11.5px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.specs dd{margin:0;font-variant-numeric:tabular-nums}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:22px;color:var(--muted);display:grid;gap:10px;justify-items:start}
+
+/* forms */
+form.post{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:22px;max-width:880px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:14px}
+legend{font-family:var(--f-display);font-weight:700;font-size:18px;font-stretch:90%;margin-bottom:12px;padding:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid2 > *,.grid3 > *{min-width:0}
+.form-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
+.err{color:var(--danger);font-size:14px}
+.result{max-width:880px;margin-top:18px}
+
+/* deal room */
+.room{display:grid;grid-template-columns:280px minmax(0,1fr) 340px;gap:14px;align-items:start}
+.room > *{min-width:0}
+.tlist{display:grid;gap:6px;max-height:72vh;overflow:auto}
+.titem{text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;cursor:pointer;display:grid;gap:4px;width:100%}
+.titem:hover{border-color:var(--accent)}
+.titem[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.titem .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.titem .last{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;height:72vh;min-height:460px}
+.chat-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.chat-head h3{font-size:17px}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.msg{max-width:78%;display:grid;gap:3px}
+.msg .who{font-size:11.5px;color:var(--muted);font-family:var(--f-mono)}
+.msg .bubble{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end}
+.msg.me .who{text-align:right}
+.msg.me .bubble{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.msg.sys{align-self:center;max-width:92%;text-align:center}
+.msg.sys .bubble{background:transparent;border:1px dashed var(--line);color:var(--muted);font-size:13.5px}
+.offer-card{border:1px solid var(--signal);background:var(--signal-soft);color:var(--ink);border-radius:10px;padding:11px 13px;display:grid;gap:4px}
+.msg.me .offer-card{border-color:var(--accent);background:var(--accent-soft)}
+.offer-card .t{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--signal)}
+.msg.me .offer-card .t{color:var(--accent-text)}
+.offer-card .amt{font-family:var(--f-display);font-weight:750;font-size:20px;font-stretch:90%}
+.accept-card{border:1px solid var(--ok);background:var(--ok-soft);border-radius:10px;padding:11px 13px;color:var(--ink)}
+.pending{padding:12px 16px;border-top:1px solid var(--line);background:var(--signal-soft);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.composer{border-top:1px solid var(--line);padding:12px;display:grid;gap:10px}
+.composer .line{display:flex;gap:8px}
+.composer .line input{flex:1}
+.offer-form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;background:var(--sunk);padding:10px;border-radius:8px}
+.offer-form > *{min-width:0}
+.calc-line{grid-column:1/-1;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.side-toggle{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.side-toggle button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--muted);padding:5px 10px;cursor:pointer}
+.side-toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.details{display:grid;gap:12px}
+.details .panel{padding:16px}
+.details h4{margin:0 0 10px;font-family:var(--f-display);font-size:15px;font-stretch:90%}
+.scorebar{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden;margin:8px 0 10px}
+.scorebar span{display:block;height:100%;background:var(--accent)}
+.reasons{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px}
+.reasons li{display:flex;gap:8px}
+.reasons .pts{font-family:var(--f-mono);font-size:12px;color:var(--accent-text);min-width:34px}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp th{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase}
+.cmp td:first-child{color:var(--muted)}
+.cl{list-style:none;padding:0;margin:0;display:grid;gap:8px;font-size:13.5px}
+.cl li{display:flex;gap:9px;align-items:flex-start}
+.box{flex:none;width:16px;height:16px;border:2px solid var(--line);border-radius:3px;margin-top:2px;display:grid;place-items:center}
+.box.done{background:var(--ok);border-color:var(--ok)}
+.box.done::after{content:"";width:7px;height:4px;border-left:2px solid var(--surface);border-bottom:2px solid var(--surface);transform:rotate(-45deg) translate(1px,-1px)}
+.cl button.box{cursor:pointer;padding:0;background:transparent}
+.cl button.box.done{background:var(--ok)}
+.status{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:4px}
+.status.matched{background:var(--accent-soft);color:var(--accent-text)}
+.status.negotiating{background:var(--signal-soft);color:var(--signal)}
+.status.agreed{background:var(--ok-soft);color:var(--ok)}
+.status.complete{background:var(--ok);color:var(--surface)}
+.ai-out{display:grid;gap:8px;font-size:13.5px}
+.ai-out ul{margin:0;padding-left:18px}
+.back{display:none}
+.combo{position:relative;display:block}
+.combo-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.22);max-height:340px;overflow:auto;font-weight:400}
+.combo-list li{padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.combo-list li[aria-selected="true"],.combo-list li:hover{background:var(--accent-soft)}
+.combo-list .nm{min-width:0;overflow-wrap:anywhere}
+.combo-list .nm small{display:block;color:var(--muted);font-size:12px}
+.combo-list .cas{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.combo-list .custom{border-top:1px solid var(--line);margin-top:4px;color:var(--muted)}
+.combo-list .note{padding:8px 10px;color:var(--muted);font-size:13px;cursor:default}
+.combo-list .note:hover{background:transparent}
+.verified{color:var(--ok)!important;font-weight:500!important}
+.has-acct .auto{display:none!important}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start;min-width:0}
+.tile .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile .val{font-family:var(--f-display);font-weight:800;font-stretch:85%;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.tile .sub{font-size:13px;color:var(--muted)}
+.tile.tile-hero{border-color:var(--accent);background:var(--accent-soft)}
+.plan{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;margin-top:16px;align-items:start}
+.plan > *{min-width:0}
+.chart-box{position:relative}
+.chart-box svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-box .tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;box-shadow:0 8px 20px rgba(0,0,0,.18);white-space:nowrap;z-index:5;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink);margin-bottom:8px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px}
+.dash-sec{margin-top:24px}
+.datatable{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.datatable th,.datatable td{text-align:left;padding:8px 10px 8px 0;border-bottom:1px solid var(--line)}
+.datatable th{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.datatable td.n,.datatable th.n{text-align:right}
+input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--accent)}
+@media (max-width:980px){.tiles{grid-template-columns:1fr 1fr}.plan{grid-template-columns:1fr}}
+@media (max-width:460px){.tiles{grid-template-columns:1fr}}
+.as-line{font-size:14px;color:var(--muted);background:var(--sunk);border-radius:var(--r);padding:10px 12px}
+.as-line strong{color:var(--ink)}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.role{flex-direction:row!important;align-items:flex-start;gap:10px!important;border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--surface);cursor:pointer;font-weight:500!important}
+.role input{width:auto;margin-top:3px;accent-color:var(--accent)}
+.role span{display:grid;gap:3px}
+.role:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.acct-grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
+.acct-grid > *{min-width:0}
+.acct-side{display:grid;gap:20px}
+.gate{max-width:880px}
+@media (max-width:860px){.acct-grid,.roles{grid-template-columns:1fr}}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:50;max-width:calc(100% - 32px)}
+footer{background:var(--head);border-top:1px solid var(--line);padding-block:28px;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media (max-width:1100px){
+  .room{grid-template-columns:260px minmax(0,1fr)}
+  .details{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .integr{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .hero,.two,.cols,.fee{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .steps > div{border-right:0;border-bottom:1px solid var(--line)}
+  .steps > div:last-child{border-bottom:0}
+  .criteria{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  .room{grid-template-columns:1fr}
+  .room.open .tlist-wrap{display:none}
+  .room:not(.open) .chat,.room:not(.open) .details{display:none}
+  .back{display:inline-flex}
+  .chat{height:70vh}
+}
+@media (max-width:520px){
+  .grid2,.grid3,.integr{grid-template-columns:1fr}
+  .offer-form{grid-template-columns:1fr 1fr}
+  .offer-form .btn{grid-column:1/-1}
+  nav.links{margin-left:0;width:100%}
+  .msg{max-width:90%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#home" aria-label="WasteXchange home">
+      <img src="logo.png" alt="wasteXchange" width="170" height="36">
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#market" data-nav="market">Marketplace</a>
+      <a href="#sell" data-nav="sell">Sell surplus</a>
+      <a href="#buy" data-nav="buy">Source materials</a>
+      <a href="#deals" data-nav="deals">Deal room <span class="count" id="deal-count" hidden></span></a>
+      <a href="#dashboard" data-nav="dashboard">Dashboard</a>
+      <a href="#account" data-nav="account" id="nav-account">Account</a>
+      <a href="#login" data-nav="login" id="nav-auth">Log in</a>
+    </nav>
+  </div>
+</header>
+<div class="banner" id="banner" hidden><div class="wrap" id="banner-text"></div></div>
+
+<main>
+<!-- HOME -->
+<section class="view" id="v-home">
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow">Industrial surplus marketplace</p>
+      <h1 style="margin-top:12px">Your plant's waste is a local business's feedstock.</h1>
+      <p class="lede">Chemical plants and manufacturers post surplus by material type, spec range and legal limits. WasteXchange matches it to buyers who can legally receive and actually use it, then handles the transfer paperwork and the logistics.</p>
+      <div class="cta-row">
+        <a class="btn" href="#sell">Post surplus material</a>
+        <a class="btn ghost" href="#buy">Source materials</a>
+      </div>
+    </div>
+    <div class="flow" aria-label="How material moves">
+      <div class="node"><h4>Plant posts surplus</h4><p>Material, classification, purity range, quantity, pickup location.</p></div>
+      <div class="pipe"><span></span></div>
+      <div class="node hub"><h4>WasteXchange</h4><p>Matches, opens the deal room, prepares documents, books the carrier.</p>
+        <div class="chips"><span class="chip accent">Match</span><span class="chip accent">Compliance</span><span class="chip accent">Logistics</span><span class="chip accent">Settlement</span></div>
+      </div>
+      <div class="pipe"><span></span></div>
+      <div class="node"><h4>Local business receives</h4><p>Usable material inside its permits, at a lower cost than virgin inputs.</p></div>
+    </div>
+  </div>
+
+  <div class="band"><div class="wrap">
+    <div class="band-head"><p class="eyebrow">How a transfer moves</p><h2>From posting to paid, without the back-and-forth.</h2></div>
+    <div class="steps">
+      <div><span class="n">01</span><h3>Post</h3><p>The plant lists the material with its waste classification, purity range, quantity and pickup site.</p></div>
+      <div><span class="n">02</span><h3>Match</h3><p>The match engine checks every open buyer request and opens a deal room with each compatible buyer instantly.</p></div>
+      <div><span class="n">03</span><h3>Negotiate</h3><p>Buyer and seller message, send offers and accept terms inside the deal room.</p></div>
+      <div><span class="n">04</span><h3>Comply and ship</h3><p>WasteXchange prepares the required transfer documents and books a qualified carrier.</p></div>
+      <div><span class="n">05</span><h3>Settle</h3><p>The seller is paid in full on delivery acceptance. The buyer pays the 7.5% exchange fee.</p></div>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap two">
+    <div class="panel">
+      <p class="eyebrow">For plants and manufacturers</p>
+      <h3 style="margin-top:8px;font-size:22px">Turn a disposal bill into revenue.</h3>
+      <ul class="ticks">
+        <li>Zero seller fees. You keep the full agreed price.</li>
+        <li>Buyers are matched by material, spec range and what their permits allow.</li>
+        <li>Transfer paperwork prepared and filed for you.</li>
+        <li>Pickup scheduled by WasteXchange with a qualified carrier.</li>
+        <li>Certificates of recycling for your sustainability and ESG reporting.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <p class="eyebrow">For local businesses</p>
+      <h3 style="margin-top:8px;font-size:22px">Buy usable inputs for less.</h3>
+      <ul class="ticks">
+        <li>Only see material inside your accepted purity range.</li>
+        <li>Matches respect the waste classes your permits let you receive.</li>
+        <li>Quantities capped at your storage and permit limits.</li>
+        <li>Negotiate and close inside one deal room.</li>
+        <li>One transparent 7.5% fee, charged only when an exchange completes.</li>
+      </ul>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <div class="band-head"><p class="eyebrow">Match engine</p><h2>What gets checked before two companies are connected.</h2><p class="muted">Gates must pass or no match is made. Weighted factors rank the matches that remain on a 100 point score.</p></div>
+    <div class="criteria">
+      <div><span class="kind gate">Gate</span><h3>Material category</h3><p>Seller's material and buyer's request are the same material family.</p></div>
+      <div><span class="kind gate">Gate</span><h3>Legal classification</h3><p>Non-hazardous, universal waste, used oil or RCRA hazardous must be a class the buyer is permitted to receive.</p></div>
+      <div><span class="kind gate">Gate</span><h3>Usable spec range</h3><p>The seller's purity or concentration range must overlap the buyer's acceptable range.</p></div>
+      <div><span class="kind weight">Up to 30 pts</span><h3>Spec fit</h3><p>How much of the seller's range sits inside what the buyer can use.</p></div>
+      <div><span class="kind weight">Up to 25 pts each</span><h3>Quantity and distance</h3><p>Volume against the buyer's receiving limit, and pickup site against the buyer's sourcing radius.</p></div>
+      <div><span class="kind weight">Up to 20 pts</span><h3>Price fit</h3><p>Asking price against the buyer's maximum, converted to the same unit. A gap is flagged for negotiation, never hidden.</p></div>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <div class="band-head"><p class="eyebrow">Pricing</p><h2>Sellers pay nothing. Buyers pay 7.5% on completed exchanges.</h2></div>
+    <div class="fee">
+      <div class="panel" style="display:grid;gap:14px;align-content:start">
+        <div><div class="bigfig">$0</div><p class="muted" style="margin-top:6px">Seller fee, on every exchange</p></div>
+        <div><div class="bigfig" style="color:var(--accent-text)">7.5%</div><p class="muted" style="margin-top:6px">Buyer transaction fee, charged only on a successful exchange</p></div>
+      </div>
+      <div class="panel">
+        <label for="calc-value">Exchange value (USD)
+          <input id="calc-value" type="number" min="0" step="100" value="20000" inputmode="decimal">
+          <span class="hint">Starts at the $20,000 example. Change it to any deal size.</span>
+        </label>
+        <table class="ledger" style="margin-top:14px">
+          <tr><td>Agreed material price</td><td id="c-sub"></td></tr>
+          <tr><td>Seller fee</td><td>$0.00</td></tr>
+          <tr><td>Seller receives</td><td id="c-seller"></td></tr>
+          <tr><td>Buyer fee (7.5%) to WasteXchange</td><td id="c-fee"></td></tr>
+          <tr class="total"><td>Buyer pays</td><td id="c-total"></td></tr>
+        </table>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <div class="band-head"><p class="eyebrow">Integrations roadmap</p><h2>Plugs into the software plants already run.</h2><p class="muted">Planned direct connections, so surplus is posted from the systems that already track it. These are on the roadmap and not live yet.</p></div>
+    <div class="integr">
+      <div><span class="chip signal">Planned</span><h3>SAP ERP</h3><p>Post surplus straight from inventory and scrap records, and sync settled transfers back to finance.</p></div>
+      <div><span class="chip signal">Planned</span><h3>Oracle NetSuite</h3><p>Create listings from item records and record revenue from each completed exchange.</p></div>
+      <div><span class="chip signal">Planned</span><h3>Environmental compliance software</h3><p>Push manifests, certificates and diversion records into the plant's compliance system of record.</p></div>
+      <div><span class="chip signal">Planned</span><h3>Waste tracking systems</h3><p>Pull generated waste streams automatically and close them out when material leaves the site.</p></div>
+    </div>
+<pre class="schema" aria-label="Planned listing API fields">POST /v1/listings   <span class="t">// planned</span>
+{
+  <span class="k">"material_category"</span>: <span class="t">string</span>,
+  <span class="k">"classification"</span>:    <span class="t">"non_hazardous" | "universal_waste" | "used_oil" | "rcra_hazardous"</span>,
+  <span class="k">"spec_range_pct"</span>:    <span class="t">{ "min": number, "max": number }</span>,
+  <span class="k">"quantity"</span>:          <span class="t">{ "value": number, "unit": "lbs" | "tons" | "gal" | "drums" | "totes" | "cu_yd" }</span>,
+  <span class="k">"pickup_location"</span>:   <span class="t">{ "city": string, "state": string }</span>,
+  <span class="k">"asking_price"</span>:      <span class="t">{ "per_unit_usd": number }</span>,
+  <span class="k">"source_system_ref"</span>: <span class="t">string   // SAP or NetSuite record id</span>
+}</pre>
+  </div></div>
+
+  <div class="band"><div class="wrap two">
+    <div>
+      <p class="eyebrow">Why it matters</p>
+      <h2 style="margin-top:10px">Circular, local, and on the record.</h2>
+    </div>
+    <ul class="ticks" style="margin:0">
+      <li>Plants lower disposal costs by selling what they used to pay to haul away.</li>
+      <li>Local businesses cut input costs with material that meets their spec.</li>
+      <li>Every completed transfer carries documentation of diversion from landfill, ready for ESG reporting.</li>
+      <li>Short hauls between nearby companies keep material and money in the regional economy.</li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- MARKET -->
+<section class="view" id="v-market" hidden>
+  <div class="wrap">
+    <div class="page-head">
+      <div><p class="eyebrow">Live marketplace</p><h2>Available surplus and open buyer requests</h2><p class="muted">Everything here was posted on WasteXchange. New posts are matched the moment they go up.</p></div>
+      <div class="cta-row" style="margin:0"><a class="btn" href="#sell">Post surplus</a><a class="btn ghost" href="#buy">Post a buyer request</a></div>
+    </div>
+    <div class="cols">
+      <div>
+        <div class="col-head"><h3>Available surplus</h3><span class="mono muted" id="l-count"></span></div>
+        <div class="cards" id="listings"></div>
+      </div>
+      <div>
+        <div class="col-head"><h3>Buyer requests</h3><span class="mono muted" id="r-count"></span></div>
+        <div class="cards" id="requests"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SELL -->
+<section class="view" id="v-sell" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">For chemical plants and manufacturers</p><h2>Add a chemical you sell</h2><p class="muted">No seller fees. Each chemical you add is matched to every compatible buyer, and a deal room opens with each one right away.</p></div></div>
+    <div class="gate" id="s-gate"></div>
+    <form class="post" id="sell-form" novalidate>
+      <p class="as-line" id="s-as" hidden></p>
+      <fieldset>
+        <legend>Chemical</legend>
+        <div class="grid2">
+          <label for="s-material">Chemical or material name<span class="combo"><input id="s-material" name="material" required maxlength="160" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="s-material-list" data-cas="s-cas" data-cat="s-category"><ul class="combo-list" id="s-material-list" role="listbox" hidden></ul></span><span class="hint" id="s-material-hint">Start typing a chemical name or CAS number and pick it from the list.</span></label>
+          <label for="s-cas">CAS number<input id="s-cas" name="cas" maxlength="12" inputmode="numeric" pattern="\d{2,7}-\d{2}-\d"><span class="hint">Optional, for example 67-64-1.</span></label>
+        </div>
+        <div class="grid2">
+          <label for="s-category">Material category<select id="s-category" name="category" required></select></label>
+          <label class="auto" for="s-company">Company or plant name<input id="s-company" name="company" required maxlength="80" autocomplete="organization"></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Legal limits</legend>
+        <div class="grid2">
+          <label for="s-class">Waste classification<select id="s-class" name="classification" required></select></label>
+          <label for="s-gen">Generator status<select id="s-gen" name="generator">
+            <option value="na">Not applicable</option><option value="vsqg">Very small quantity generator</option><option value="sqg">Small quantity generator</option><option value="lqg">Large quantity generator</option></select></label>
+        </div>
+        <div class="checks"><label><input type="checkbox" id="s-sds" name="sds"> Safety Data Sheet or material profile on hand</label></div>
+      </fieldset>
+      <fieldset>
+        <legend>Spec, quantity and price</legend>
+        <div class="grid3">
+          <label for="s-specmin">Purity or concentration, low (%)<input id="s-specmin" name="specMin" type="number" min="0" max="100" step="0.1" inputmode="decimal"><span class="hint">Leave both blank if not applicable.</span></label>
+          <label for="s-specmax">Purity or concentration, high (%)<input id="s-specmax" name="specMax" type="number" min="0" max="100" step="0.1" inputmode="decimal"></label>
+          <label for="s-freq">Availability<select id="s-freq" name="frequency"><option value="once">One-time lot</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></label>
+        </div>
+        <div class="grid3">
+          <label for="s-qty">Quantity available<input id="s-qty" name="qty" type="number" min="0" step="any" required inputmode="decimal"></label>
+          <label for="s-unit">Unit<select id="s-unit" name="unit" required></select></label>
+          <label for="s-price">Asking price per unit (USD)<input id="s-price" name="price" type="number" min="0" step="0.01" required inputmode="decimal"><span class="hint">Enter 0 to give it away and skip disposal.</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Pickup</legend>
+        <div class="grid3">
+          <label class="auto" for="s-city">City<input id="s-city" name="city" required maxlength="60" autocomplete="address-level2"></label>
+          <label class="auto" for="s-state">State<select id="s-state" name="state" required></select></label>
+          <label for="s-pack">Packaging<select id="s-pack" name="packaging"><option>Bulk</option><option>55 gal drums</option><option>275 gal totes</option><option>Roll-off container</option><option>Gaylords</option><option>Pallets</option></select></label>
+        </div>
+        <label for="s-notes">Notes for buyers<textarea id="s-notes" name="notes" maxlength="600"></textarea></label>
+      </fieldset>
+      <div class="form-foot"><button class="btn" type="submit" id="s-submit">Add chemical and find buyers</button><span class="err" id="s-err" role="alert"></span></div>
+    </form>
+    <div class="result" id="s-result"></div>
+  </div>
+</section>
+
+<!-- BUY -->
+<section class="view" id="v-buy" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">For buyers</p><h2>Add a chemical you need</h2><p class="muted">Tell us the chemical, the spec you can use and how much. You are matched with every compatible listing now and every new one later.</p></div></div>
+    <div class="gate" id="b-gate"></div>
+    <form class="post" id="buy-form" novalidate>
+      <p class="as-line" id="b-as" hidden></p>
+      <fieldset>
+        <legend>What you need</legend>
+        <div class="grid2">
+          <label for="b-material">Chemical or material you need<span class="combo"><input id="b-material" name="material" required maxlength="160" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="b-material-list" data-cas="b-cas" data-cat="b-category"><ul class="combo-list" id="b-material-list" role="listbox" hidden></ul></span><span class="hint" id="b-material-hint">Start typing a chemical name or CAS number and pick it from the list.</span></label>
+          <label for="b-cas">CAS number<input id="b-cas" name="cas" maxlength="12" inputmode="numeric" pattern="\d{2,7}-\d{2}-\d"><span class="hint">Optional.</span></label>
+        </div>
+        <div class="grid2">
+          <label class="auto" for="b-company">Business name<input id="b-company" name="company" required maxlength="80" autocomplete="organization"></label>
+          <label for="b-category">Material category<select id="b-category" name="category" required></select></label>
+          <label for="b-use">Intended use<input id="b-use" name="use" required maxlength="120"><span class="hint">How the material goes back into production.</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Legal limits</legend>
+        <div class="auto">
+          <p style="font-size:13px;font-weight:600;margin-bottom:8px">Classifications you are permitted to receive</p>
+          <div class="checks" id="b-classes"></div>
+          <p class="hint muted" style="font-size:12px;margin-top:6px">Only check classes your permits allow. Matches never cross this line.</p>
+        </div>
+        <div class="grid3">
+          <label for="b-minqty">Minimum useful quantity<input id="b-minqty" name="minQty" type="number" min="0" step="any" required inputmode="decimal"></label>
+          <label for="b-maxqty">Maximum you can receive<input id="b-maxqty" name="maxQty" type="number" min="0" step="any" required inputmode="decimal"><span class="hint">Your storage or permit limit per shipment.</span></label>
+          <label for="b-unit">Unit<select id="b-unit" name="unit" required></select></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Spec, price and location</legend>
+        <div class="grid3">
+          <label for="b-specmin">Acceptable purity, low (%)<input id="b-specmin" name="specMin" type="number" min="0" max="100" step="0.1" inputmode="decimal"><span class="hint">Leave both blank if any spec works.</span></label>
+          <label for="b-specmax">Acceptable purity, high (%)<input id="b-specmax" name="specMax" type="number" min="0" max="100" step="0.1" inputmode="decimal"></label>
+          <label for="b-maxprice">Maximum price per unit (USD)<input id="b-maxprice" name="maxPrice" type="number" min="0" step="0.01" inputmode="decimal"><span class="hint">Optional.</span></label>
+        </div>
+        <div class="grid3 auto">
+          <label for="b-city">Delivery city<input id="b-city" name="city" required maxlength="60" autocomplete="address-level2"></label>
+          <label for="b-state">State<select id="b-state" name="state" required></select></label>
+          <label for="b-radius">Sourcing radius<select id="b-radius" name="radius"><option value="city">Same city only</option><option value="state" selected>Same state</option><option value="any">Any state</option></select></label>
+        </div>
+      </fieldset>
+      <div class="form-foot"><button class="btn" type="submit" id="b-submit">Add chemical and find sellers</button><span class="err" id="b-err" role="alert"></span></div>
+    </form>
+    <div class="result" id="b-result"></div>
+  </div>
+</section>
+
+<!-- LOGIN -->
+<section class="view" id="v-login" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">WasteXchange login</p><h2 id="login-title">Log in to WasteXchange</h2><p class="muted" id="login-sub">Plants and buyers use one login to post chemicals, get matched and close deals.</p></div></div>
+    <form class="post" id="login-form" novalidate style="max-width:480px">
+      <div class="side-toggle" role="group" aria-label="Log in or create a login" style="justify-self:start"><button type="button" data-auth="in" aria-pressed="true">Log in</button><button type="button" data-auth="up" aria-pressed="false">Create a login</button></div>
+      <label for="l-email">Work email<input id="l-email" type="email" autocomplete="email" required maxlength="200"></label>
+      <label for="l-pass">Password<input id="l-pass" type="password" autocomplete="current-password" minlength="8" required maxlength="200"><span class="hint" id="l-pass-hint">At least 8 characters.</span></label>
+      <div class="form-foot"><button class="btn" type="submit" id="l-submit">Log in</button><span class="err" id="l-err" role="alert"></span></div>
+      <p id="l-msg" class="as-line" hidden></p>
+    </form>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="view" id="v-dashboard" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">Seller dashboard</p><h2 id="dash-title">Your savings on WasteXchange</h2><p class="muted" id="dash-sub">What you have sold, what you no longer pay to dispose of, and your 2-year plan.</p></div></div>
+    <div id="dash-body"></div>
+  </div>
+</section>
+
+<!-- ACCOUNT -->
+<section class="view" id="v-account" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">Your WasteXchange account</p><h2 id="acct-title">Account</h2><p class="muted" id="acct-sub"></p></div></div>
+    <div id="acct-body"></div>
+  </div>
+</section>
+
+<!-- DEALS -->
+<section class="view" id="v-deals" hidden>
+  <div class="wrap">
+    <div class="page-head"><div><p class="eyebrow">Deal room</p><h2>Matches and negotiations</h2><p class="muted" id="deals-sub">Every match opens a conversation between the buyer and the seller. Offers, acceptance and the transfer checklist all live here.</p></div></div>
+    <div class="room" id="room">
+      <div class="tlist-wrap"><div class="tlist" id="tlist"></div></div>
+      <div class="chat" id="chat"></div>
+      <div class="details" id="details"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><img src="logo.png" alt="wasteXchange" style="height:28px;width:auto">Industrial surplus, matched and moved.</span><span>Test version. Compliance documents and freight are handled by the WasteXchange team after a deal is agreed.</span></div></footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supabase-adapter.js"></script>
+<script>
+(() => {
+"use strict";
+/* ---------- reference data ---------- */
+const CATEGORIES = [
+  ["solvents","Spent solvents"],["acids","Acids"],["caustics","Caustics and bases"],["glycols","Glycols and antifreeze"],
+  ["oils","Oils and lubricants"],["resins","Resins, polymers and off-spec chemicals"],["plastics","Plastic regrind and scrap"],
+  ["ferrous","Ferrous scrap metal"],["nonferrous","Non-ferrous scrap metal"],["catalysts","Spent catalysts"],
+  ["ash","Fly ash and combustion residuals"],["foundry","Foundry sand"],["wood","Wood and pallets"],["paper","Cardboard and paper"],
+  ["rubber","Rubber"],["glass","Glass cullet"],["other","Other process byproducts"]];
+const CAT = Object.fromEntries(CATEGORIES);
+const CLASSES = [["nonhaz","Non-hazardous"],["universal","Universal waste"],["usedoil","Used oil"],["rcra","RCRA hazardous"]];
+const CLS = Object.fromEntries(CLASSES);
+const UNITS = {lbs:{dim:"mass",f:1,label:"lbs",short:"lb"},tons:{dim:"mass",f:2000,label:"tons",short:"ton"},
+  gal:{dim:"vol",f:1,label:"gallons",short:"gal"},drums:{dim:"vol",f:55,label:"drums (55 gal)",short:"drum"},
+  totes:{dim:"vol",f:275,label:"totes (275 gal)",short:"tote"},cuyd:{dim:"cuyd",f:1,label:"cubic yards",short:"cu yd"}};
+const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+const DOCS = {
+  nonhaz:["Material profile and Safety Data Sheet","Non-hazardous waste determination from the generator","Bill of lading","Certificate of reuse or recycling from the receiver"],
+  universal:["Material profile","Universal waste shipment records (40 CFR Part 273)","Bill of lading","Certificate of recycling"],
+  usedoil:["Used oil analysis or halogen screening record (40 CFR Part 279)","EPA ID number for the used oil transporter","Bill of lading with acceptance record","Certificate of recycling"],
+  rcra:["Waste profile and Safety Data Sheet","EPA ID numbers for generator, transporter and receiving facility","Uniform Hazardous Waste Manifest (EPA Form 8700-22) through e-Manifest","DOT shipping papers and placards (49 CFR Part 172)","Certificate of recycling from the receiving facility"]};
+const OPS = ["Transfer documents verified","Carrier booked","Picked up at seller","Delivered and accepted by buyer","Payment released to seller"];
+const FEE = 0.075;
+const SELL_IND = ["Chemical manufacturing","Petrochemical and refining","Plastics and resin manufacturing","Pharmaceutical manufacturing","Paints, coatings and adhesives","Automotive manufacturing","Metal fabrication and finishing","Steel, foundry and casting","Electronics and semiconductors","Food and beverage processing","Pulp and paper","Power generation","Other manufacturing"];
+const BUY_IND = ["Solvent recycling and recovery","Material recovery and recycling","Cement and concrete","Construction materials","Contract manufacturing","Plastics molding and compounding","Metal casting","Cleaning and chemical products","Agriculture","Fuel blending","Wastewater treatment","Other"];
+const ROLE_LABEL = {seller:"Seller account", buyer:"Buyer account", both:"Seller and buyer account"};
+const CAS_RE = /^\d{2,7}-\d{2}-\d$/;
+
+/* ---------- helpers ---------- */
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = (n, forceCents) => (n == null || isNaN(n)) ? "" : Number(n).toLocaleString("en-US",{style:"currency",currency:"USD",minimumFractionDigits:(forceCents||Math.abs(n)<100)?2:0,maximumFractionDigits:(forceCents||Math.abs(n)<100)?2:0});
+const num = n => Number(n).toLocaleString("en-US",{maximumFractionDigits:2});
+const r2 = n => Math.round(n*100)/100;
+const ago = t => { if(!t) return ""; const s=(Date.now()-t)/1000; if(s<60) return "just now"; if(s<3600) return Math.floor(s/60)+"m ago"; if(s<86400) return Math.floor(s/3600)+"h ago"; return new Date(t).toLocaleDateString("en-US",{month:"short",day:"numeric"}); };
+const specText = (a,b) => (a==null||b==null) ? "Not specified" : (a===b ? a+"%" : a+"% to "+b+"%");
+const qtyText = (q,u) => num(q)+" "+(UNITS[u]?.label || u);
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,3200); }
+function optList(sel, pairs, placeholder){ sel.innerHTML = (placeholder?`<option value="">${esc(placeholder)}</option>`:"") + pairs.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join(""); }
+
+/* ---------- state ---------- */
+let db = null, user = null, myId = null, isOwner = false, canWrite = null;
+let listings = [], requests = [], threads = [], msgs = [];
+let openTid = null, unsubMsgs = null, actingSide = {}, offerOpen = false, aiBusy = false;
+let loaded = {l:false,r:false,t:false,a:false};
+let accounts = {}, acctEditing = false;
+const myAccount = () => (myId && accounts[myId]) || null;
+
+/* ---------- forms setup ---------- */
+optList($("#s-category"), CATEGORIES, "Choose a category");
+optList($("#b-category"), CATEGORIES, "Choose a category");
+optList($("#s-class"), CLASSES, "Choose a classification");
+optList($("#s-unit"), Object.entries(UNITS).map(([k,v])=>[k,v.label]));
+optList($("#b-unit"), Object.entries(UNITS).map(([k,v])=>[k,v.label]));
+optList($("#s-state"), STATES.map(s=>[s,s]), "State");
+optList($("#b-state"), STATES.map(s=>[s,s]), "State");
+$("#b-classes").innerHTML = CLASSES.map(([v,l])=>`<label><input type="checkbox" id="b-cls-${v}" name="classes" value="${v}"${v==="nonhaz"?" checked":""}> ${esc(l)}</label>`).join("");
+
+/* ---------- fee calculator ---------- */
+function calc(){ const v=Math.max(0,Number($("#calc-value").value)||0); const fee=r2(v*FEE);
+  $("#c-sub").textContent=money(v,true); $("#c-seller").textContent=money(v,true); $("#c-fee").textContent=money(fee,true); $("#c-total").textContent=money(r2(v+fee),true); }
+$("#calc-value").addEventListener("input", calc); calc();
+
+/* ---------- match engine ---------- */
+function scorePair(L, R){
+  if (!L || !R || L.category !== R.category) return null;
+  if (!(R.classes||[]).includes(L.classification)) return null;
+  const lu = UNITS[L.unit], ru = UNITS[R.unit];
+  if (!lu || !ru || lu.dim !== ru.dim) return null;
+  const reasons = [];
+  // location gate
+  const sameState = L.state === R.state;
+  const sameCity = sameState && (L.city||"").trim().toLowerCase() === (R.city||"").trim().toLowerCase();
+  if (R.radius === "city" && !sameCity) return null;
+  if (R.radius === "state" && !sameState) return null;
+  // spec gate
+  let spec = 20;
+  const hasL = L.specMin != null && L.specMax != null, hasR = R.specMin != null && R.specMax != null;
+  if (hasL && hasR){
+    const lo = Math.max(L.specMin, R.specMin), hi = Math.min(L.specMax, R.specMax);
+    if (hi < lo) return null;
+    const width = L.specMax - L.specMin;
+    const frac = width === 0 ? 1 : (hi - lo) / width;
+    spec = Math.round(15 + 15*frac);
+    reasons.push({pts:spec, text: frac>=1 ? `Seller's full range ${specText(L.specMin,L.specMax)} is inside the buyer's ${specText(R.specMin,R.specMax)}` : `${Math.round(frac*100)}% of the seller's range falls inside the buyer's ${specText(R.specMin,R.specMax)}`});
+  } else if (hasR && !hasL){
+    spec = 12; reasons.push({pts:spec, text:"Buyer has a purity requirement and the seller gave no range. Confirm with a sample or lab sheet."});
+  } else {
+    reasons.push({pts:spec, text:"No purity requirement on the buyer side"});
+  }
+  // quantity gate + score
+  const lQty = L.qty * lu.f, rMin = R.minQty * ru.f, rMax = R.maxQty * ru.f;
+  if (lQty < rMin) return null;
+  const transferBase = Math.min(lQty, rMax);
+  const qty = Math.round(25 * Math.min(1, lQty / rMax));
+  reasons.push({pts:qty, text: lQty >= rMax ? `Seller can fill the buyer's full limit of ${qtyText(R.maxQty,R.unit)}` : `Seller has ${qtyText(L.qty,L.unit)}, above the buyer's minimum`});
+  // location score
+  const loc = sameCity ? 25 : sameState ? 18 : 8;
+  reasons.push({pts:loc, text: sameCity ? `Same city: ${L.city}, ${L.state}` : sameState ? `Same state: ${L.city} to ${R.city}, ${L.state}` : `Interstate: ${L.state} to ${R.state}`});
+  // price score
+  let price;
+  const lp = L.price / lu.f;
+  if (R.maxPrice == null){ price = 12; reasons.push({pts:price, text:"Buyer set no price ceiling"}); }
+  else {
+    const rp = R.maxPrice / ru.f;
+    if (lp <= rp){ price = 20; reasons.push({pts:price, text:`Asking ${money(L.price,true)}/${lu.short} is within the buyer's maximum`}); }
+    else { const gap = (lp-rp)/lp; price = Math.max(0, Math.round(20*(1-gap*2))); reasons.push({pts:price, text:`Asking price is ${Math.round(gap*100)}% above the buyer's maximum. Open to negotiation.`}); }
+  }
+  if (L.cas && R.cas && L.cas === R.cas) reasons.unshift({pts:0, text:`Same registered chemical: CAS ${L.cas}`});
+  const score = Math.min(100, spec + qty + loc + price);
+  return {score, reasons, transferQty: r2(transferBase / lu.f)};
+}
+
+/* ---------- routing ---------- */
+const VIEWS = ["home","market","sell","buy","deals","account","dashboard","login"];
+function route(){
+  const h = (location.hash||"").replace("#","");
+  const v = VIEWS.includes(h) ? h : "home";
+  VIEWS.forEach(x => $("#v-"+x).hidden = x !== v);
+  document.querySelectorAll("[data-nav]").forEach(a => a.setAttribute("aria-current", a.dataset.nav===v ? "page" : "false"));
+  if (v === "deals") renderDeals();
+  if (v === "market") renderMarket();
+  if (v === "account") renderAccount();
+  if (v === "dashboard") renderDashboard();
+  if (v === "sell" || v === "buy") renderGates();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+
+/* ---------- banner ---------- */
+function banner(text){ const b=$("#banner"); if(!text){ b.hidden=true; return; } $("#banner-text").textContent=text; b.hidden=false; }
+
+/* ---------- market render ---------- */
+function specDl(items){ return `<dl class="specs">${items.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
+function emptyBox(text, href, cta){ return `<div class="empty"><span>${esc(text)}</span>${href?`<a class="btn small" href="${href}">${esc(cta)}</a>`:""}</div>`; }
+function renderMarket(){
+  const L = listings.filter(x=>x.status!=="closed"), R = requests.filter(x=>x.status!=="closed");
+  $("#l-count").textContent = loaded.l ? L.length+" open" : "";
+  $("#r-count").textContent = loaded.r ? R.length+" open" : "";
+  $("#listings").innerHTML = !db ? emptyBox("Listings load when this page is opened on claude.ai while signed in.") :
+    !loaded.l ? emptyBox("Loading listings...") :
+    L.length ? L.map(x => `<article class="card${x.ownerId===myId?" mine":""}">
+      <div class="row"><div><h4>${esc(x.material)}</h4><p class="sub">${esc(x.company)} · ${esc(x.city)}, ${esc(x.state)} · ${ago(x.createdAt)}</p></div>
+      <span class="chip ${x.classification==="rcra"?"danger":x.classification==="nonhaz"?"ok":"signal"}">${esc(CLS[x.classification])}</span></div>
+      ${specDl([["Category",CAT[x.category]],...(x.cas?[["CAS",x.cas]]:[]),["Quantity",qtyText(x.qty,x.unit)],["Spec",specText(x.specMin,x.specMax)],["Asking",x.price===0?"Free":money(x.price,true)+"/"+UNITS[x.unit].short],["Availability",{once:"One-time",weekly:"Weekly",monthly:"Monthly",quarterly:"Quarterly"}[x.frequency]||""],["Packaging",x.packaging||""]])}
+      ${x.ownerId===myId?`<div class="row"><span class="chip accent">Your listing</span><button class="btn small danger" data-close-l="${esc(x.id)}">Take down</button></div>`:""}
+    </article>`).join("") : emptyBox("No surplus posted yet. Post the first listing and it will be matched to every open buyer request.", "#sell", "Post surplus");
+  $("#requests").innerHTML = !db ? emptyBox("Buyer requests load when this page is opened on claude.ai while signed in.") :
+    !loaded.r ? emptyBox("Loading buyer requests...") :
+    R.length ? R.map(x => `<article class="card${x.ownerId===myId?" mine":""}">
+      <div class="row"><div><h4>${esc(x.material)}</h4><p class="sub">${esc(x.company)} · ${esc(x.city)}, ${esc(x.state)} · ${ago(x.createdAt)}</p></div>
+      <span class="chip">${esc({city:"Same city",state:"Same state",any:"Any state"}[x.radius])}</span></div>
+      ${specDl([["Category",CAT[x.category]],...(x.cas?[["CAS",x.cas]]:[]),["Needs",num(x.minQty)+" to "+qtyText(x.maxQty,x.unit)],["Spec",specText(x.specMin,x.specMax)],["Max price",x.maxPrice==null?"Open":money(x.maxPrice,true)+"/"+UNITS[x.unit].short],["Permitted",(x.classes||[]).map(c=>CLS[c]).join(", ")],["Use",x.use||""]])}
+      ${x.ownerId===myId?`<div class="row"><span class="chip accent">Your request</span><button class="btn small danger" data-close-r="${esc(x.id)}">Close request</button></div>`:""}
+    </article>`).join("") : emptyBox("No buyer requests yet. Post what your business can use and you will be matched to current and future listings.", "#buy", "Post a buyer request");
+}
+document.addEventListener("click", async e => {
+  const cl = e.target.closest("[data-close-l]"), cr = e.target.closest("[data-close-r]");
+  if (!cl && !cr) return;
+  try { await db.doc((cl?"listings/":"requests/")+(cl?cl.dataset.closeL:cr.dataset.closeR)).update({status:"closed"}); toast(cl?"Listing taken down":"Request closed"); }
+  catch(err){ toast(writeErr(err)); }
+});
+function writeErr(err){
+  if (err?.code === "quota_exceeded") return "The marketplace storage is full. Close old listings and try again.";
+  if (err?.code === "invalid_argument") return "That change is not allowed for your login. Log out, log back in and try again.";
+  return "That did not save. Check your connection and try again.";
+}
+
+
+/* ---------- chemical picker (EPA TSCA inventory + common names) ---------- */
+let CHEM = null, chemLoading = null;
+function loadChem(){
+  if (chemLoading) return chemLoading;
+  chemLoading = fetch("chemicals.json").then(r => { if(!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
+    CHEM = d.map(x => ({name:x[0], cas:x[1], active:!!x[2], other:x[3] ? x[3].split("|") : [], n:x[0].toLowerCase(), o:x[3] ? x[3].toLowerCase() : ""}));
+    return CHEM;
+  }).catch(e => { chemLoading = null; throw e; });
+  return chemLoading;
+}
+function searchChem(q){
+  q = q.trim().toLowerCase(); if (!q || !CHEM) return [];
+  const isCas = /^[\d-]+$/.test(q);
+  const out = [];
+  for (const c of CHEM){
+    let s = -1;
+    if (isCas){ if (c.cas === q) s = 100; else if (c.cas.startsWith(q)) s = 60; }
+    else {
+      if (c.n === q) s = 100;
+      else if (c.n.startsWith(q)) s = 80;
+      else if (c.o && ("|"+c.o).includes("|"+q)) s = 70;
+      else { const i = c.n.indexOf(q); if (i > 0 && /[\s,(\-]/.test(c.n[i-1])) s = 55; else if (i > 0) s = 35; else if (c.o.includes(q)) s = 25; }
+    }
+    if (s < 0) continue;
+    s += c.active ? 8 : 0; s -= Math.min(c.name.length, 80) / 20;
+    out.push([s, c]);
+  }
+  out.sort((a,b) => b[0]-a[0]);
+  return out.slice(0, 8).map(x => x[1]);
+}
+const picks = {}; // input id -> {name, cas} or {custom:name}
+function pickerHint(inp, html){ const h = $("#"+inp.id+"-hint"); h.innerHTML = html; h.classList.toggle("verified", html.startsWith("Verified")); }
+function resetPicker(id){ delete picks[id]; const inp=$("#"+id); if(inp) pickerHint(inp, "Start typing a chemical name or CAS number and pick it from the list."); }
+function choose(inp, c){
+  picks[inp.id] = c.custom ? {custom:c.custom} : {name:c.name, cas:c.cas};
+  inp.value = c.custom || c.name;
+  if (!c.custom){ $("#"+inp.dataset.cas).value = c.cas; pickerHint(inp, `Verified: CAS ${esc(c.cas)}, EPA TSCA inventory${c.active?"":" (not currently active in commerce)"}.`); }
+  else pickerHint(inp, "Entered as typed. Use this for mixtures and byproducts that have no single CAS number.");
+  closeList(inp);
+}
+function closeList(inp){ const ul=$("#"+inp.id+"-list"); ul.hidden=true; inp.setAttribute("aria-expanded","false"); inp.removeAttribute("aria-activedescendant"); }
+let chemTimer = null;
+function renderList(inp){
+  const ul = $("#"+inp.id+"-list"); const q = inp.value.trim();
+  if (!q){ closeList(inp); return; }
+  if (!CHEM){
+    ul.innerHTML = `<li class="note">Loading the chemical list...</li>`; ul.hidden=false; inp.setAttribute("aria-expanded","true");
+    loadChem().then(()=>{ if (document.activeElement===inp) renderList(inp); }).catch(()=>{ ul.innerHTML = `<li class="note">The chemical list did not load. Type the name and it will be saved as entered.</li>`; });
+    return;
+  }
+  const res = searchChem(q);
+  ul._res = res;
+  ul.innerHTML = res.map((c,i) => `<li role="option" id="${inp.id}-opt-${i}" data-i="${i}" aria-selected="false"><span class="nm">${esc(c.name)}${(() => { const ql=q.toLowerCase(); const al = !c.n.includes(ql) && c.other.find(o=>o.toLowerCase().includes(ql)); return al ? `<small>also called ${esc(al)}</small>` : ""; })()}</span><span class="cas">${esc(c.cas)}</span></li>`).join("")
+    + (res.length ? "" : `<li class="note">No registered chemical matches "${esc(q)}". Check the spelling.</li>`)
+    + `<li role="option" class="custom" id="${inp.id}-opt-c" data-custom="1" aria-selected="false">Use "${esc(q)}" as typed (mixture or byproduct)</li>`;
+  ul.hidden = false; inp.setAttribute("aria-expanded","true"); ul._active = -1;
+}
+document.addEventListener("focusin", e => { if (e.target.matches?.("input[role=combobox]")) loadChem().catch(()=>{}); });
+document.addEventListener("input", e => {
+  const inp = e.target; if (!inp.matches?.("input[role=combobox]")) return;
+  if (picks[inp.id] && inp.value !== (picks[inp.id].name || picks[inp.id].custom)){ delete picks[inp.id]; pickerHint(inp, "Pick a chemical from the list."); }
+  clearTimeout(chemTimer); chemTimer = setTimeout(() => renderList(inp), 60);
+});
+document.addEventListener("keydown", e => {
+  const inp = e.target; if (!inp.matches?.("input[role=combobox]")) return;
+  const ul = $("#"+inp.id+"-list"); if (ul.hidden) return;
+  const opts = [...ul.querySelectorAll("li[role=option]")]; if (!opts.length) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp"){
+    e.preventDefault(); ul._active = ((ul._active ?? -1) + (e.key==="ArrowDown"?1:-1) + opts.length) % opts.length;
+    opts.forEach((o,i)=>o.setAttribute("aria-selected", i===ul._active)); opts[ul._active].scrollIntoView({block:"nearest"}); inp.setAttribute("aria-activedescendant", opts[ul._active].id);
+  } else if (e.key === "Enter"){
+    e.preventDefault(); const o = opts[ul._active >= 0 ? ul._active : 0]; o?.dispatchEvent(new MouseEvent("mousedown",{bubbles:true}));
+  } else if (e.key === "Escape"){ closeList(inp); }
+});
+document.addEventListener("mousedown", e => {
+  const li = e.target.closest(".combo-list li[role=option]"); if (!li) return;
+  e.preventDefault(); const ul = li.parentElement; const inp = $("#"+ul.id.replace(/-list$/,""));
+  if (li.dataset.custom) choose(inp, {custom: inp.value.trim()}); else choose(inp, ul._res[Number(li.dataset.i)]);
+});
+document.addEventListener("focusout", e => { if (e.target.matches?.("input[role=combobox]")) setTimeout(()=>closeList(e.target), 120); });
+function pickerOk(id, err){
+  const inp = $("#"+id), p = picks[id], v = inp.value.trim();
+  if (p && (p.name === v || p.custom === v)) return p;
+  err.textContent = "Pick the chemical from the dropdown list, or choose \"Use as typed\" for a mixture or byproduct.";
+  inp.focus(); renderList(inp); return null;
+}
+
+const loginBox = what => `<div class="empty"><strong style="color:var(--ink)">Log in to ${esc(what)}.</strong><span>New to WasteXchange? Creating a login is free and takes a minute.</span><a class="btn small" href="#login">Log in or create a login</a></div>`;
+/* ---------- posting ---------- */
+function readForm(form){
+  const f = new FormData(form); const o = {};
+  for (const [k,v] of f.entries()){ if (k==="classes") (o.classes ||= []).push(v); else o[k] = typeof v==="string" ? v.trim() : v; }
+  return o;
+}
+const numOrNull = v => (v===""||v==null) ? null : Number(v);
+function ready(errEl){
+  if (!db){ errEl.textContent = "The marketplace could not connect. Reload the page and try again."; return false; }
+  if (!myId){ errEl.textContent = "Log in to post."; return false; }
+  return true;
+}
+async function openMatches(own, side){
+  // own = the new listing (side seller) or request (side buyer)
+  const pool = side==="seller" ? requests.filter(r=>r.status!=="closed") : listings.filter(l=>l.status!=="closed");
+  const made = [];
+  for (const other of pool){
+    const L = side==="seller" ? own : other, R = side==="seller" ? other : own;
+    const m = scorePair(L, R); if (!m) continue;
+    const tid = "t-" + L.id + "-" + R.id;
+    const ref = db.doc("threads/"+tid);
+    const ex = await ref.get(); if (ex.exists){ made.push({tid, m, other}); continue; }
+    const now = Date.now();
+    const lsnap = {company:L.company, material:L.material, cas:L.cas||"", category:L.category, classification:L.classification, generator:L.generator||"na", sds:!!L.sds, specMin:L.specMin, specMax:L.specMax, qty:L.qty, unit:L.unit, price:L.price, city:L.city, state:L.state, packaging:L.packaging||"", frequency:L.frequency||"once", notes:L.notes||""};
+    const rsnap = {company:R.company, material:R.material, cas:R.cas||"", classes:R.classes, specMin:R.specMin, specMax:R.specMax, minQty:R.minQty, maxQty:R.maxQty, unit:R.unit, maxPrice:R.maxPrice, city:R.city, state:R.state, radius:R.radius, use:R.use||""};
+    const intro = `WasteXchange matched ${L.company}'s ${L.material} with ${R.company}. Match score ${m.score} of 100. Up to ${qtyText(m.transferQty, L.unit)} can move under the buyer's limits. Use this room to agree on quantity and price. WasteXchange handles the documents and pickup once you agree.`;
+    await ref.set({listingId:L.id, requestId:R.id, sellerId:L.ownerId, buyerId:R.ownerId, sellerCo:L.company, buyerCo:R.company,
+      material:L.material, category:L.category, classification:L.classification, listing:lsnap, request:rsnap,
+      score:m.score, reasons:m.reasons, transferQty:m.transferQty, status:"matched", offer:null, deal:null, ops:null, ai:null,
+      createdAt:now, updatedAt:now, lastText:intro});
+    await ref.collection("messages").doc().set({side:"system", kind:"system", text:intro, createdAt:now});
+    made.push({tid, m, other});
+  }
+  return made.sort((a,b)=>b.m.score-a.m.score);
+}
+function resultHtml(made, side){
+  if (!made.length) return `<div class="empty"><strong style="color:var(--ink)">Posted. No compatible ${side==="seller"?"buyers":"listings"} yet.</strong><span>It stays live and is matched automatically the moment a compatible ${side==="seller"?"buyer request":"listing"} is posted.</span><a class="btn small ghost" href="#market">View the marketplace</a></div>`;
+  return `<div class="panel"><p class="eyebrow">Posted and matched</p><h3 style="margin:6px 0 12px">${made.length} compatible ${side==="seller"?"buyer":"listing"}${made.length>1?"s":""} found. Deal rooms are open.</h3>
+    <div class="cards">${made.map(x=>`<div class="card"><div class="row"><div><h4>${esc(x.other.company)}</h4><p class="sub">${esc(x.other.material)} · ${esc(x.other.city)}, ${esc(x.other.state)}</p></div><span class="chip accent mono">${x.m.score}/100</span></div>
+      <button class="btn small" data-open-thread="${esc(x.tid)}">Open deal room</button></div>`).join("")}</div></div>`;
+}
+document.addEventListener("click", e => { const b=e.target.closest("[data-open-thread]"); if(!b) return; openTid=b.dataset.openThread; offerOpen=false; location.hash="deals"; if(location.hash==="#deals") route(); });
+
+$("#sell-form").addEventListener("submit", async e => {
+  e.preventDefault(); const err=$("#s-err"); err.textContent="";
+  const f = e.target; if (!f.checkValidity()){ err.textContent="Fill in the required fields: company, category, description, classification, quantity, price, city and state."; f.reportValidity(); return; }
+  if (!ready(err)) return;
+  const pk = pickerOk("s-material", err); if (!pk) return;
+  const o = readForm(f);
+  const L = {verified: !!pk.cas, company:o.company, material:o.material, cas:o.cas||"", category:o.category, classification:o.classification, generator:o.generator, sds:!!o.sds,
+    specMin:numOrNull(o.specMin), specMax:numOrNull(o.specMax), frequency:o.frequency, qty:Number(o.qty), unit:o.unit, price:Number(o.price),
+    city:o.city, state:o.state, packaging:o.packaging, notes:o.notes||""};
+  if (L.cas && !CAS_RE.test(L.cas)){ err.textContent="CAS numbers look like 67-64-1. Fix it or leave it blank."; return; }
+  if ((L.specMin==null) !== (L.specMax==null)){ err.textContent="Enter both the low and high purity, or leave both blank."; return; }
+  if (L.specMin!=null && L.specMin > L.specMax){ err.textContent="The low purity must be less than or equal to the high purity."; return; }
+  if (!(L.qty>0)){ err.textContent="Quantity must be more than zero."; return; }
+  const btn=$("#s-submit"); btn.disabled=true; btn.textContent="Posting and matching...";
+  try{
+    const ref = db.collection("listings").doc();
+    Object.assign(L, {id:ref.id, ownerId:myId, status:"open", createdAt:Date.now()});
+    await ref.set(L);
+    const made = await openMatches(L, "seller");
+    $("#s-result").innerHTML = resultHtml(made, "seller"); f.reset(); resetPicker("s-material"); applyAccount();
+    $("#s-result").scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(ex){ err.textContent = writeErr(ex); }
+  finally{ btn.disabled=false; btn.textContent="Add chemical and find buyers"; }
+});
+$("#buy-form").addEventListener("submit", async e => {
+  e.preventDefault(); const err=$("#b-err"); err.textContent="";
+  const f = e.target; if (!f.checkValidity()){ err.textContent="Fill in the required fields: company, category, material, intended use, quantities, city and state."; f.reportValidity(); return; }
+  if (!ready(err)) return;
+  const pk = pickerOk("b-material", err); if (!pk) return;
+  const o = readForm(f);
+  const R = {verified: !!pk.cas, company:o.company, material:o.material, cas:o.cas||"", use:o.use, category:o.category, classes:o.classes||[], specMin:numOrNull(o.specMin), specMax:numOrNull(o.specMax),
+    minQty:Number(o.minQty), maxQty:Number(o.maxQty), unit:o.unit, maxPrice:numOrNull(o.maxPrice), city:o.city, state:o.state, radius:o.radius};
+  if (R.cas && !CAS_RE.test(R.cas)){ err.textContent="CAS numbers look like 67-64-1. Fix it or leave it blank."; return; }
+  if (!R.classes.length){ err.textContent="Check at least one classification you are permitted to receive."; return; }
+  if ((R.specMin==null) !== (R.specMax==null)){ err.textContent="Enter both the low and high purity, or leave both blank."; return; }
+  if (R.specMin!=null && R.specMin > R.specMax){ err.textContent="The low purity must be less than or equal to the high purity."; return; }
+  if (!(R.maxQty>0) || R.minQty > R.maxQty){ err.textContent="The maximum must be above zero and at least the minimum."; return; }
+  const btn=$("#b-submit"); btn.disabled=true; btn.textContent="Posting and matching...";
+  try{
+    const ref = db.collection("requests").doc();
+    Object.assign(R, {id:ref.id, ownerId:myId, status:"open", createdAt:Date.now()});
+    await ref.set(R);
+    const made = await openMatches(R, "buyer");
+    $("#b-result").innerHTML = resultHtml(made, "buyer"); f.reset();
+    $("#b-cls-nonhaz").checked = true; resetPicker("b-material"); applyAccount();
+    $("#b-result").scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(ex){ err.textContent = writeErr(ex); }
+  finally{ btn.disabled=false; btn.textContent="Add chemical and find sellers"; }
+});
+
+/* ---------- deal room ---------- */
+function visibleThreads(){ return threads.filter(t => isOwner || t.sellerId===myId || t.buyerId===myId); }
+function sidesOf(t){ const s=[]; if(t.sellerId===myId) s.push("seller"); if(t.buyerId===myId) s.push("buyer"); return s; }
+function sideOf(t){ const s=sidesOf(t); if(!s.length) return null; if(s.length===1) return s[0]; return actingSide[t.id] || "seller"; }
+const statusLabel = {matched:"Matched", negotiating:"Negotiating", agreed:"Agreed", complete:"Complete"};
+function updateCount(){ const n = visibleThreads().filter(t=>t.status!=="complete").length; const c=$("#deal-count"); c.textContent=n; c.hidden=!n; }
+
+function renderDeals(){
+  const list = visibleThreads();
+  $("#deals-sub").textContent = isOwner ? "Operations view. You see every match on the exchange and mark transfer steps complete." : "Every match opens a conversation between the buyer and the seller. Offers, acceptance and the transfer checklist all live here.";
+  const room = $("#room");
+  if (!db || !myId){ room.className="room"; $("#tlist").innerHTML = !db ? emptyBox("The deal room could not connect. Reload the page.") : loginBox("see your matches and deals"); $("#chat").innerHTML=""; $("#details").innerHTML=""; $("#chat").hidden=true; $("#details").hidden=true; return; }
+  if (!loaded.t){ $("#tlist").innerHTML = emptyBox("Loading deal rooms..."); $("#chat").hidden=true; $("#details").hidden=true; return; }
+  if (!list.length){
+    room.className="room"; $("#chat").hidden=true; $("#details").hidden=true;
+    $("#tlist").innerHTML = `<div class="empty" style="grid-column:1/-1"><strong style="color:var(--ink)">No matches yet.</strong><span>Post surplus or a buyer request. When a compatible counterpart exists, a deal room opens here automatically.</span><div class="cta-row" style="margin:0"><a class="btn small" href="#sell">Post surplus</a><a class="btn small ghost" href="#buy">Post a buyer request</a></div></div>`;
+    $("#tlist").parentElement.style.gridColumn="1/-1"; return;
+  }
+  $("#tlist").parentElement.style.gridColumn="";
+  if (!openTid || !list.find(t=>t.id===openTid)){ if (window.matchMedia("(min-width:861px)").matches) openTid = list[0].id; else openTid = openTid && list.find(t=>t.id===openTid) ? openTid : null; }
+  room.className = "room" + (openTid ? " open" : "");
+  $("#tlist").innerHTML = list.map(t => {
+    const s = sidesOf(t); const other = s.includes("seller") && !s.includes("buyer") ? t.buyerCo : s.includes("buyer") && !s.includes("seller") ? t.sellerCo : t.sellerCo+" and "+t.buyerCo;
+    return `<button class="titem" data-tid="${esc(t.id)}" aria-current="${t.id===openTid}">
+      <div class="row"><strong>${esc(other)}</strong><span class="mono muted" style="font-size:12px">${ago(t.updatedAt)}</span></div>
+      <div class="row"><span style="font-size:13px">${esc(t.material)}</span><span class="status ${t.status}">${statusLabel[t.status]||t.status}</span></div>
+      <div class="last">${esc(t.lastText||"")}</div></button>`; }).join("");
+  const t = list.find(x=>x.id===openTid);
+  $("#chat").hidden = !t; $("#details").hidden = !t;
+  if (t){ subscribeMsgs(t.id); renderChat(t); renderDetails(t); }
+}
+document.addEventListener("click", e => { const b=e.target.closest("[data-tid]"); if(!b) return; if(openTid!==b.dataset.tid){ openTid=b.dataset.tid; offerOpen=false; msgs=[]; renderDeals(); } });
+
+function subscribeMsgs(tid){
+  if (subscribeMsgs.tid === tid) return;
+  if (unsubMsgs) unsubMsgs(); subscribeMsgs.tid = tid; msgs = []; subscribeMsgs.loaded=false;
+  unsubMsgs = db.collection("threads/"+tid+"/messages").orderBy("createdAt","asc").limit(500).onSnapshot(snap => {
+    msgs = snap.docs.map(d=>({id:d.id, ...d.data()})); subscribeMsgs.loaded=true;
+    const t = threads.find(x=>x.id===openTid); if (t && !$("#v-deals").hidden) renderChat(t);
+  }, () => { subscribeMsgs.loaded=true; });
+}
+
+function partyName(t, side){ return side==="seller" ? t.sellerCo : side==="buyer" ? t.buyerCo : "WasteXchange"; }
+function renderChat(t){
+  const me = sideOf(t); const chat = $("#chat");
+  const keepDraft = $("#msg-input")?.value || "";
+  const offerVals = offerOpen ? {q:$("#of-qty")?.value, p:$("#of-price")?.value} : null;
+  const u = UNITS[t.listing.unit];
+  const both = sidesOf(t).length === 2;
+  const msgHtml = !subscribeMsgs.loaded ? `<div class="msg sys"><div class="bubble">Loading messages...</div></div>` : msgs.map(m => {
+    if (m.kind==="system") return `<div class="msg sys"><div class="bubble">${esc(m.text)}</div></div>`;
+    const mine = me && m.side===me;
+    const who = `${esc(partyName(t,m.side))} · ${m.side==="seller"?"Seller":"Buyer"} · ${ago(m.createdAt)}`;
+    let body;
+    if (m.kind==="offer"){ const sub=r2(m.qty*m.price);
+      body = `<div class="offer-card"><span class="t">${m.counter?"Counteroffer":"Offer"}</span><span class="amt">${esc(qtyText(m.qty,m.unit))} at ${money(m.price,true)}/${esc(UNITS[m.unit].short)}</span><span class="mono" style="font-size:13px">Material ${money(sub,true)} · Buyer fee ${money(r2(sub*FEE),true)} · Buyer total ${money(r2(sub*(1+FEE)),true)}</span>${m.text?`<span>${esc(m.text)}</span>`:""}</div>`; }
+    else if (m.kind==="accept") body = `<div class="accept-card"><strong>Offer accepted.</strong> ${esc(m.text||"")}</div>`;
+    else if (m.kind==="decline") body = `<div class="bubble"><em>Declined the offer.</em> ${esc(m.text||"")}</div>`;
+    else body = `<div class="bubble">${esc(m.text)}</div>`;
+    return `<div class="msg${mine?" me":""}"><span class="who">${who}</span>${body}</div>`;
+  }).join("");
+  const pendingForMe = t.offer && me && t.offer.side !== me && t.status!=="agreed" && t.status!=="complete";
+  const pendingMine = t.offer && me && t.offer.side === me && t.status!=="agreed" && t.status!=="complete";
+  const closed = t.status==="agreed" || t.status==="complete";
+  chat.innerHTML = `
+    <div class="chat-head">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn small ghost back" id="back">All deals</button><div><h3>${esc(t.material)}</h3><span class="muted" style="font-size:13px">${esc(t.sellerCo)} (seller) and ${esc(t.buyerCo)} (buyer)</span></div></div>
+      ${both ? `<div class="side-toggle" role="group" aria-label="Reply as"><button data-side="seller" aria-pressed="${me==="seller"}">Reply as seller</button><button data-side="buyer" aria-pressed="${me==="buyer"}">Reply as buyer</button></div>` : me ? `<span class="chip accent">You are the ${me}</span>` : `<span class="chip">Operations view</span>`}
+    </div>
+    <div class="msgs" id="msgs">${msgHtml}</div>
+    ${pendingForMe ? `<div class="pending"><span><strong>${esc(partyName(t,t.offer.side))}</strong> offered ${esc(qtyText(t.offer.qty,t.offer.unit))} at ${money(t.offer.price,true)}/${esc(UNITS[t.offer.unit].short)}</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" id="accept">Accept</button><button class="btn small ghost" id="counter">Counter</button><button class="btn small danger" id="decline">Decline</button></span></div>` : ""}
+    ${pendingMine ? `<div class="pending"><span>Your offer is waiting on ${esc(partyName(t, me==="seller"?"buyer":"seller"))}.</span></div>` : ""}
+    ${me ? `<div class="composer">
+      ${offerOpen && !closed ? `<div class="offer-form">
+        <label for="of-qty">Quantity (${esc(u.label)})<input id="of-qty" type="number" min="0" step="any" inputmode="decimal" value="${esc(offerVals?.q ?? (t.offer?.qty ?? t.transferQty))}"></label>
+        <label for="of-price">Price per ${esc(u.short)} (USD)<input id="of-price" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(offerVals?.p ?? (t.offer?.price ?? t.listing.price))}"></label>
+        <button class="btn" id="send-offer">Send offer</button>
+        <div class="calc-line" id="of-calc"></div></div>` : ""}
+      <div class="line"><input id="msg-input" placeholder="Message ${esc(partyName(t, me==="seller"?"buyer":"seller"))}" maxlength="1000" aria-label="Message"><button class="btn" id="send">Send</button>${closed?"":`<button class="btn ghost" id="toggle-offer">${offerOpen?"Close offer":"Make offer"}</button>`}</div>
+    </div>` : `<div class="composer"><span class="muted" style="font-size:13px">You are viewing this deal as the exchange operator. Buyer and seller messages appear live.</span></div>`}`;
+  const mi = $("#msg-input"); if (mi && keepDraft) mi.value = keepDraft;
+  const box = $("#msgs"); box.scrollTop = box.scrollHeight;
+  if (offerOpen) offerCalc();
+}
+function offerCalc(){ const q=Number($("#of-qty")?.value)||0, p=Number($("#of-price")?.value)||0; const sub=r2(q*p);
+  const el=$("#of-calc"); if(el) el.textContent=`Material ${money(sub,true)} · Seller receives ${money(sub,true)} · Buyer fee 7.5% ${money(r2(sub*FEE),true)} · Buyer pays ${money(r2(sub*(1+FEE)),true)}`; }
+
+async function postMsg(t, m, threadPatch){
+  const now = Date.now();
+  await db.collection("threads/"+t.id+"/messages").doc().set({...m, from:myId, createdAt:now});
+  await db.doc("threads/"+t.id).update({...threadPatch, updatedAt:now, lastText: m.kind==="offer" ? `${partyName(t,m.side)} offered ${qtyText(m.qty,m.unit)} at ${money(m.price,true)}/${UNITS[m.unit].short}` : m.kind==="accept" ? "Offer accepted. Transfer in progress." : m.kind==="decline" ? `${partyName(t,m.side)} declined the offer` : m.text});
+}
+document.addEventListener("input", e => { if (e.target.id==="of-qty"||e.target.id==="of-price") offerCalc(); });
+document.addEventListener("keydown", e => { if (e.target.id==="msg-input" && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("#send")?.click(); } });
+document.addEventListener("click", async e => {
+  const t = threads.find(x=>x.id===openTid); if (!t) return;
+  const id = e.target.closest("button")?.id; const sideBtn = e.target.closest("[data-side]");
+  if (sideBtn){ actingSide[t.id]=sideBtn.dataset.side; renderChat(t); return; }
+  if (id==="back"){ openTid=null; renderDeals(); return; }
+  const me = sideOf(t);
+  try{
+    if (id==="send"){ const v=$("#msg-input").value.trim(); if(!v) return; $("#msg-input").value=""; await postMsg(t,{side:me,kind:"text",text:v},{}); }
+    else if (id==="toggle-offer"){ offerOpen=!offerOpen; renderChat(t); }
+    else if (id==="counter"){ offerOpen=true; renderChat(t); $("#of-price")?.focus(); }
+    else if (id==="send-offer"){
+      const q=Number($("#of-qty").value), p=Number($("#of-price").value);
+      if (!(q>0) || !(p>=0) || $("#of-price").value===""){ toast("Enter a quantity above zero and a price."); return; }
+      const maxQ = t.transferQty; if (q > maxQ + 1e-9){ toast(`That exceeds what can legally move here: ${qtyText(maxQ,t.listing.unit)}.`); return; }
+      const counter = !!(t.offer && t.offer.side !== me);
+      offerOpen=false;
+      await postMsg(t,{side:me,kind:"offer",qty:q,unit:t.listing.unit,price:p,counter},{status:"negotiating",offer:{side:me,by:myId,qty:q,unit:t.listing.unit,price:p,at:Date.now()}});
+    }
+    else if (id==="accept"){
+      const o=t.offer; const sub=r2(o.qty*o.price), fee=r2(sub*FEE);
+      await postMsg(t,{side:me,kind:"accept",text:`${qtyText(o.qty,o.unit)} at ${money(o.price,true)}/${UNITS[o.unit].short}. WasteXchange is preparing the transfer documents and booking pickup.`},
+        {status:"agreed", offer:null, deal:{qty:o.qty, unit:o.unit, price:o.price, subtotal:sub, fee, total:r2(sub+fee), agreedAt:Date.now()}, ops:OPS.map(l=>({label:l,done:false}))});
+    }
+    else if (id==="decline"){ await postMsg(t,{side:me,kind:"decline",text:""},{offer:null,status:"matched"}); }
+    else if (id==="ai-review"){ runAi(t); }
+  }catch(err){ toast(writeErr(err)); }
+});
+
+function renderDetails(t){
+  const L=t.listing, R=t.request, u=UNITS[L.unit], ru=UNITS[R.unit];
+  const docs = DOCS[t.classification]||[];
+  const ops = t.ops || [];
+  const d = t.deal;
+  const ai = t.ai;
+  $("#details").innerHTML = `
+    <div class="panel"><h4>Match score</h4>
+      <div style="display:flex;align-items:baseline;gap:8px"><span class="bigfig" style="font-size:40px">${t.score}</span><span class="muted mono">/ 100</span><span class="status ${t.status}" style="margin-left:auto">${statusLabel[t.status]||t.status}</span></div>
+      <div class="scorebar"><span style="width:${Math.max(0,Math.min(100,t.score))}%"></span></div>
+      <ul class="reasons">${(t.reasons||[]).map(r=>`<li><span class="pts">${r.pts?"+"+r.pts:"="}</span><span>${esc(r.text)}</span></li>`).join("")}</ul>
+    </div>
+    ${d ? `<div class="panel"><h4>Agreed terms</h4><table class="ledger">
+      <tr><td>${esc(qtyText(d.qty,d.unit))} at ${money(d.price,true)}/${esc(UNITS[d.unit].short)}</td><td>${money(d.subtotal,true)}</td></tr>
+      <tr><td>Seller fee</td><td>$0.00</td></tr>
+      <tr><td>Seller receives</td><td>${money(d.subtotal,true)}</td></tr>
+      <tr><td>Buyer fee (7.5%)</td><td>${money(d.fee,true)}</td></tr>
+      <tr class="total"><td>Buyer pays</td><td>${money(d.total,true)}</td></tr></table>
+      <p class="muted" style="font-size:12.5px;margin-top:8px">Freight is quoted by WasteXchange after documents are verified.</p></div>` : ""}
+    <div class="panel"><h4>Usable material check</h4><div style="overflow-x:auto"><table class="cmp">
+      <tr><th></th><th>Seller has</th><th>Buyer accepts</th></tr>
+      <tr><td>Business</td><td>${esc(accounts[t.sellerId]?.industry||"")}</td><td>${esc(accounts[t.buyerId]?.industry||"")}</td></tr>
+      ${(L.cas||R.cas)?`<tr><td>CAS</td><td>${esc(L.cas||"Not given")}</td><td>${esc(R.cas||"Not given")}</td></tr>`:""}
+      <tr><td>Class</td><td>${esc(CLS[L.classification])}</td><td>${esc((R.classes||[]).map(c=>CLS[c]).join(", "))}</td></tr>
+      <tr><td>Spec</td><td>${esc(specText(L.specMin,L.specMax))}</td><td>${esc(specText(R.specMin,R.specMax))}</td></tr>
+      <tr><td>Quantity</td><td>${esc(qtyText(L.qty,L.unit))}</td><td>${esc(num(R.minQty)+" to "+qtyText(R.maxQty,R.unit))}</td></tr>
+      <tr><td>Price</td><td>${L.price===0?"Free":esc(money(L.price,true)+"/"+u.short)}</td><td>${R.maxPrice==null?"Open":esc(money(R.maxPrice,true)+"/"+ru.short)}</td></tr>
+      <tr><td>Location</td><td>${esc(L.city+", "+L.state)}</td><td>${esc(R.city+", "+R.state)}</td></tr>
+      <tr><td>Use</td><td>${esc(L.packaging||"")}</td><td>${esc(R.use||"")}</td></tr>
+    </table></div></div>
+    <div class="panel"><h4>Transfer documents WasteXchange handles</h4>
+      <ul class="cl">${docs.map(x=>`<li><span class="box${ops[0]?.done?" done":""}"></span><span>${esc(x)}</span></li>`).join("")}</ul>
+      ${L.sds?"":`<p style="font-size:12.5px;margin-top:10px;color:var(--signal)">Seller has not confirmed a Safety Data Sheet yet.</p>`}
+    </div>
+    <div class="panel"><h4>Transfer progress</h4>
+      ${ops.length ? `<ul class="cl">${ops.map((o,i)=>`<li>${isOwner?`<button class="box${o.done?" done":""}" data-op="${i}" aria-label="Mark ${esc(o.label)} ${o.done?"not done":"done"}"></button>`:`<span class="box${o.done?" done":""}"></span>`}<span>${esc(o.label)}</span></li>`).join("")}</ul>
+        ${isOwner?`<p class="muted" style="font-size:12.5px;margin-top:10px">As the operator, check off each step as it happens. Both parties see it live.</p>`:""}`
+        : `<p class="muted" style="font-size:13.5px">Starts when an offer is accepted. WasteXchange then verifies documents, books the carrier and releases payment on delivery.</p>`}
+    </div>
+    <div class="panel"><h4>AI compatibility review</h4>
+      ${ai ? `<div class="ai-out"><span class="chip ${ai.verdict==="compatible"?"ok":ai.verdict==="conditional"?"signal":"danger"}" style="justify-self:start">${esc({compatible:"Compatible",conditional:"Compatible with conditions",not_compatible:"Not compatible"}[ai.verdict]||ai.verdict)}</span>
+        <p>${esc(ai.summary)}</p>
+        ${ai.handling?.length?`<div><strong>Handling</strong><ul>${ai.handling.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+        ${ai.questions?.length?`<div><strong>Confirm before pickup</strong><ul>${ai.questions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+        <span class="muted" style="font-size:12px">Generated by Claude ${ago(ai.at)}. Advisory only.</span></div>`
+        : `<p class="muted" style="font-size:13.5px;margin-bottom:10px">Claude reviews both sides' specs for usability, handling and open questions.</p>`}
+      ${(sideOf(t)||isOwner) ? `<button class="btn small ghost" id="ai-review" style="margin-top:10px" ${aiBusy?"disabled":""}>${aiBusy?"Reviewing...":ai?"Run again":"Run AI review"}</button>`:""}
+      <p class="err" id="ai-err" style="font-size:13px;margin-top:6px"></p>
+    </div>`;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-op]"); if (!b || !isOwner) return;
+  const t = threads.find(x=>x.id===openTid); if (!t || !t.ops) return;
+  const i = Number(b.dataset.op); const ops = t.ops.map((o,j)=> j===i ? {...o, done:!o.done} : {...o});
+  const all = ops.every(o=>o.done);
+  try{
+    await db.doc("threads/"+t.id).update({ops, status: all ? "complete" : "agreed", updatedAt:Date.now(), lastText: ops[i].done ? ops[i].label : "Step reopened: "+ops[i].label});
+    if (ops[i].done) await db.collection("threads/"+t.id+"/messages").doc().set({side:"system",kind:"system",text:"WasteXchange: "+ops[i].label+(all?". Transfer complete.":"."),createdAt:Date.now()});
+  }catch(err){ toast(writeErr(err)); }
+});
+
+async function runAi(t){
+  const err = $("#ai-err");
+  let sample = null; try { sample = await window.claude?.use?.("sample"); } catch {}
+  if (!sample){ if(err) err.textContent="AI review is not available in this view."; return; }
+  aiBusy = true; renderDetails(t);
+  const prompt = `You review proposed transfers of industrial surplus material between a generating plant (seller) and a business that will reuse it (buyer) on a US marketplace. Judge whether the material is usable for the buyer's stated purpose and what handling applies. Be concrete and brief. Do not invent facts beyond the data.
+
+Seller listing: ${JSON.stringify(t.listing)}
+Buyer request: ${JSON.stringify(t.request)}
+Waste classification codes: nonhaz = non-hazardous, universal = universal waste, usedoil = used oil, rcra = RCRA hazardous. Spec values are purity or concentration percent.
+
+Reply with JSON only: {"verdict":"compatible"|"conditional"|"not_compatible","summary":string (max 2 sentences),"handling":[up to 3 short strings],"questions":[up to 3 short strings the parties should confirm]}`;
+  try{
+    const r = await sample.json(prompt, {modelTier:"default"});
+    const ai = {verdict:String(r.verdict||"conditional"), summary:String(r.summary||"").slice(0,600),
+      handling:(Array.isArray(r.handling)?r.handling:[]).slice(0,3).map(x=>String(x).slice(0,240)),
+      questions:(Array.isArray(r.questions)?r.questions:[]).slice(0,3).map(x=>String(x).slice(0,240)), at:Date.now()};
+    await db.doc("threads/"+t.id).update({ai});
+  }catch(ex){
+    const code = ex?.code;
+    const e2 = $("#ai-err");
+    if (e2) e2.textContent = code==="not_configured" ? "AI review is not switched on yet. WasteXchange still needs to add its AI key." : code==="not_granted" ? "AI review was not allowed for this page. Allow it from the page's permissions to use it." : code==="rate_limited" ? "Too many reviews in a short time. Try again in a minute." : "The review did not complete. Try again.";
+  }finally{ aiBusy=false; const tt=threads.find(x=>x.id===t.id); if(tt && openTid===t.id) renderDetails(tt); }
+}
+
+
+/* ---------- accounts ---------- */
+function industriesFor(role){ return role==="seller" ? SELL_IND : role==="buyer" ? BUY_IND : [...SELL_IND, ...BUY_IND.filter(x=>!SELL_IND.includes(x))]; }
+const sells = a => a && a.role !== "buyer";
+const buys = a => a && a.role !== "seller";
+function applyAccount(){
+  const a = myAccount();
+  const sf = $("#sell-form"), bf = $("#buy-form");
+  sf.classList.toggle("has-acct", !!a); bf.classList.toggle("has-acct", !!a && buys(a));
+  const asLine = `Posting as <strong>${esc(a?.company)}</strong>, ${esc(a?.industry)}, ${esc(a?.city)}, ${esc(a?.state)}. <a href="#account">Edit account</a>`;
+  $("#s-as").hidden = !a; $("#b-as").hidden = !a;
+  if (!a) return;
+  $("#s-as").innerHTML = asLine; $("#b-as").innerHTML = asLine;
+  $("#s-company").value = a.company; $("#s-city").value = a.city; $("#s-state").value = a.state;
+  $("#b-company").value = a.company; $("#b-city").value = a.city; $("#b-state").value = a.state;
+  if (buys(a)){ $("#b-radius").value = a.radius || "state"; CLASSES.forEach(([v]) => { $("#b-cls-"+v).checked = (a.classes||[]).includes(v); }); }
+}
+function renderGates(){
+  const a = myAccount();
+  [["s","sell-form",sells,"sell surplus chemicals"],["b","buy-form",buys,"post chemicals you need"]].forEach(([p,fid,ok,verb]) => {
+    const g = $("#"+p+"-gate"), f = $("#"+fid);
+    let html = "";
+    if (!db) html = emptyBox("The marketplace could not connect. Reload the page.");
+    else if (!myId) html = loginBox(p==="s" ? "sell chemicals" : "post chemicals you need");
+    else if (!loaded.a) html = emptyBox("Loading your account...");
+    else if (!a) html = `<div class="empty"><strong style="color:var(--ink)">Create your free WasteXchange account first.</strong><span>Your account holds your business name, industry, location and permits, so every chemical you add is matched under the right legal limits.</span><a class="btn small" href="#account">Create account</a></div>`;
+    else if (!ok(a)) html = `<div class="empty"><strong style="color:var(--ink)">Your account is set up as a ${a.role==="seller"?"seller":"buyer"}.</strong><span>To ${verb}, switch your account to seller and buyer.</span><a class="btn small" href="#account">Edit account</a></div>`;
+    g.innerHTML = html; g.hidden = !html; f.hidden = !!html;
+  });
+}
+function acctFormHtml(a){
+  a = a || {}; const role = a.role || "seller";
+  const roles = [["seller","I sell surplus","Chemical plants and manufacturers with excess chemicals or byproducts."],["buyer","I buy materials","Businesses that reuse surplus chemicals and byproducts as inputs."],["both","Both","Sell some streams and buy others."]];
+  return `<form class="post" id="acct-form" novalidate>
+    <fieldset><legend>How will you use WasteXchange?</legend>
+      <div class="roles">${roles.map(([v,t,d])=>`<label class="role" for="a-role-${v}"><input type="radio" id="a-role-${v}" name="role" value="${v}"${role===v?" checked":""}><span><strong>${t}</strong><span class="hint">${d}</span></span></label>`).join("")}</div>
+    </fieldset>
+    <fieldset><legend>Business</legend>
+      <div class="grid2">
+        <label for="a-company">Business name<input id="a-company" name="company" required maxlength="80" autocomplete="organization" value="${esc(a.company||"")}"></label>
+        <label for="a-industry">Industry<select id="a-industry" name="industry" required></select></label>
+      </div>
+      <div class="grid3">
+        <label for="a-city">City<input id="a-city" name="city" required maxlength="60" autocomplete="address-level2" value="${esc(a.city||"")}"></label>
+        <label for="a-state">State<select id="a-state" name="state" required></select></label>
+        <label for="a-epa">EPA ID number<input id="a-epa" name="epaId" maxlength="12" value="${esc(a.epaId||"")}"><span class="hint">Optional. Needed for hazardous waste transfers.</span></label>
+      </div>
+      <div class="grid2">
+        <label for="a-contact">Contact name<input id="a-contact" name="contact" required maxlength="80" autocomplete="name" value="${esc(a.contact||"")}"></label>
+        <label for="a-phone">Business phone<input id="a-phone" name="phone" type="tel" maxlength="20" autocomplete="tel" value="${esc(a.phone||"")}"><span class="hint">Optional. Shared with your matches.</span></label>
+      </div>
+    </fieldset>
+    <fieldset id="a-sell-fs"><legend>Your disposal costs today</legend>
+      <p class="muted" style="font-size:13.5px;margin-top:-6px">Your seller dashboard uses these to show what you save with WasteXchange over 2 years.</p>
+      <div class="grid3">
+        <label for="a-dspend">Disposal spend per month (USD)<input id="a-dspend" name="dSpend" type="number" min="0" step="1" inputmode="decimal" value="${esc(a.disposal?.monthly ?? "")}"><span class="hint">Hauling, landfill, incineration and treatment fees.</span></label>
+        <label for="a-dvol">Waste disposed per month<input id="a-dvol" name="dVol" type="number" min="0" step="any" inputmode="decimal" value="${esc(a.disposal?.volume ?? "")}"></label>
+        <label for="a-dunit">Unit<select id="a-dunit" name="dUnit">${Object.entries(UNITS).map(([k,v])=>`<option value="${k}"${(a.disposal?.unit||"tons")===k?" selected":""}>${esc(v.label)}</option>`).join("")}</select></label>
+      </div>
+      <label for="a-dshare" style="max-width:420px">Share of that waste another business could reuse (%)<input id="a-dshare" name="dShare" type="number" min="1" max="100" step="1" inputmode="numeric" value="${esc(a.disposal?.share != null ? Math.round(a.disposal.share*100) : "")}"><span class="hint">Your best estimate. You can adjust it on your dashboard.</span></label>
+    </fieldset>
+    <fieldset id="a-buy-fs"><legend>Receiving limits</legend>
+      <div><p style="font-size:13px;font-weight:600;margin-bottom:8px">Classifications your permits let you receive</p>
+        <div class="checks">${CLASSES.map(([v,l])=>`<label><input type="checkbox" id="a-cls-${v}" name="classes" value="${v}"${(a.classes||["nonhaz"]).includes(v)?" checked":""}> ${esc(l)}</label>`).join("")}</div></div>
+      <label for="a-radius" style="max-width:300px">Sourcing radius<select id="a-radius" name="radius"><option value="city">Same city only</option><option value="state">Same state</option><option value="any">Any state</option></select></label>
+    </fieldset>
+    <div class="form-foot"><button class="btn" type="submit" id="a-submit">${a.company?"Save changes":"Create account"}</button>${a.company?`<button class="btn ghost" type="button" id="a-cancel">Cancel</button>`:""}<span class="err" id="a-err" role="alert"></span></div>
+  </form>`;
+}
+function syncAcctForm(industry){
+  const role = $("#acct-form input[name=role]:checked")?.value || "seller";
+  const sel = $("#a-industry"); const keep = industry ?? sel.value;
+  optList(sel, industriesFor(role).map(x=>[x,x]), "Choose your industry");
+  if (industriesFor(role).includes(keep)) sel.value = keep;
+  $("#a-buy-fs").hidden = role === "seller";
+  $("#a-sell-fs").hidden = role === "buyer";
+}
+function renderAccount(){
+  const body = $("#acct-body"), a = myAccount();
+  if (!db){ $("#acct-title").textContent="Account"; $("#acct-sub").textContent=""; body.innerHTML = emptyBox("The marketplace could not connect. Reload the page."); return; }
+  if (!myId){ $("#acct-title").textContent="Your WasteXchange account"; $("#acct-sub").textContent="Log in first, then set up your company account."; body.innerHTML = loginBox("set up your company account"); return; }
+  if (!loaded.a){ body.innerHTML = emptyBox("Loading your account..."); return; }
+  if (!a || acctEditing){
+    if ($("#acct-form") && body.dataset.mode === (a?"edit":"new")) return; // keep what they are typing
+    body.dataset.mode = a ? "edit" : "new";
+    $("#acct-title").textContent = a ? "Edit your account" : "Create your WasteXchange account";
+    $("#acct-sub").textContent = a ? "Changes apply to chemicals you add from now on." : "Free to join. Sellers never pay fees. Tell us who you are, then add the chemicals you sell or need.";
+    body.innerHTML = acctFormHtml(a);
+    optList($("#a-state"), STATES.map(s=>[s,s]), "State"); if (a?.state) $("#a-state").value = a.state;
+    if (a?.radius) $("#a-radius").value = a.radius; else $("#a-radius").value = "state";
+    syncAcctForm(a?.industry || "");
+    return;
+  }
+  body.dataset.mode = "view";
+  $("#acct-title").textContent = a.company;
+  $("#acct-sub").textContent = ROLE_LABEL[a.role] + " · " + a.industry;
+  const myL = listings.filter(x=>x.ownerId===myId && x.status!=="closed");
+  const myR = requests.filter(x=>x.ownerId===myId && x.status!=="closed");
+  const nMatch = (k,id) => threads.filter(t=>t[k]===id).length;
+  const chemCard = (x, kind) => `<article class="card"><div class="row"><div><h4>${esc(x.material)}</h4><p class="sub">${esc(CAT[x.category])}${x.cas?" · CAS "+esc(x.cas):""}</p></div>
+      ${kind==="sell"?`<span class="chip ${x.classification==="rcra"?"danger":x.classification==="nonhaz"?"ok":"signal"}">${esc(CLS[x.classification])}</span>`:""}</div>
+      ${kind==="sell" ? specDl([["Quantity",qtyText(x.qty,x.unit)],["Spec",specText(x.specMin,x.specMax)],["Asking",x.price===0?"Free":money(x.price,true)+"/"+UNITS[x.unit].short]])
+                      : specDl([["Needs",num(x.minQty)+" to "+qtyText(x.maxQty,x.unit)],["Spec",specText(x.specMin,x.specMax)],["Max price",x.maxPrice==null?"Open":money(x.maxPrice,true)+"/"+UNITS[x.unit].short]])}
+      <div class="row"><a href="#deals" class="mono" style="font-size:13px">${nMatch(kind==="sell"?"listingId":"requestId", x.id)} match${nMatch(kind==="sell"?"listingId":"requestId", x.id)===1?"":"es"}</a><button class="btn small danger" ${kind==="sell"?"data-close-l":"data-close-r"}="${esc(x.id)}">${kind==="sell"?"Take down":"Close"}</button></div></article>`;
+  body.innerHTML = `<div class="acct-grid">
+    <div class="panel"><p class="eyebrow">${esc(ROLE_LABEL[a.role])}</p><h3 style="margin:6px 0 14px">${esc(a.company)}</h3>
+      ${specDl([["Industry",a.industry],["Location",a.city+", "+a.state],["Contact",a.contact],...(a.phone?[["Phone",a.phone]]:[]),...(a.epaId?[["EPA ID",a.epaId]]:[]),...(buys(a)?[["Permitted to receive",(a.classes||[]).map(c=>CLS[c]).join(", ")],["Sourcing radius",{city:"Same city",state:"Same state",any:"Any state"}[a.radius]||""]]:[])])}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn small ghost" id="a-edit">Edit account</button>${sells(a)?`<a class="btn small" href="#dashboard">Seller dashboard</a>`:""}</div></div>
+    <div class="acct-side">
+      ${sells(a)?`<div><div class="col-head"><h3>Chemicals you sell</h3><a class="btn small" href="#sell">Add a chemical</a></div>
+        <div class="cards">${myL.length?myL.map(x=>chemCard(x,"sell")).join(""):`<div class="empty"><span>No chemicals listed yet. Add each chemical or byproduct you have in surplus, with its spec and quantity.</span><a class="btn small" href="#sell">Add your first chemical</a></div>`}</div></div>`:""}
+      ${buys(a)?`<div><div class="col-head"><h3>Chemicals you need</h3><a class="btn small" href="#buy">Add a chemical</a></div>
+        <div class="cards">${myR.length?myR.map(x=>chemCard(x,"buy")).join(""):`<div class="empty"><span>No chemicals requested yet. Add each chemical you can use, with the spec and quantity you need.</span><a class="btn small" href="#buy">Add your first chemical</a></div>`}</div></div>`:""}
+    </div></div>`;
+}
+document.addEventListener("change", e => { if (e.target.closest("#acct-form") && e.target.name==="role") syncAcctForm(); });
+document.addEventListener("click", e => {
+  if (e.target.closest("#a-edit")){ acctEditing = true; delete $("#acct-body").dataset.mode; renderAccount(); }
+  if (e.target.closest("#a-cancel")){ acctEditing = false; renderAccount(); }
+});
+document.addEventListener("submit", async e => {
+  if (e.target.id !== "acct-form") return;
+  e.preventDefault(); const f = e.target, err = $("#a-err"); err.textContent = "";
+  if (!myId){ err.textContent = "Log in to create an account."; return; }
+  if (!f.checkValidity()){ err.textContent = "Fill in your business name, industry, city, state and contact name."; f.reportValidity(); return; }
+  const o = readForm(f); const prev = myAccount();
+  const doc = {role:o.role, company:o.company, industry:o.industry, city:o.city, state:o.state, epaId:(o.epaId||"").toUpperCase(), contact:o.contact, phone:o.phone||"",
+    classes: o.role==="seller" ? [] : (o.classes||[]), radius: o.role==="seller" ? "state" : (o.radius||"state"),
+    createdAt: prev?.createdAt || Date.now(), updatedAt: Date.now()};
+  if (o.role !== "buyer"){
+    const sp = Number(o.dSpend), vo = Number(o.dVol), sh = Number(o.dShare);
+    if (o.dSpend === "" || !(sp >= 0) || !(vo > 0) || !(sh >= 1 && sh <= 100)){ err.textContent = "Enter your monthly disposal spend, how much waste you dispose of each month, and the share you think could be reused (1 to 100)."; return; }
+    doc.disposal = {monthly: sp, volume: vo, unit: o.dUnit, share: sh/100};
+  }
+  if (o.role !== "seller" && !doc.classes.length){ err.textContent = "Check at least one classification your permits let you receive."; return; }
+  const btn = $("#a-submit"); btn.disabled = true;
+  try{
+    await db.doc("accounts/"+myId).set(doc);
+    accounts = {...accounts, [myId]: {id:myId, ...doc}};
+    acctEditing = false; toast(prev ? "Account saved" : (doc.role !== "buyer" ? "Account created. Here is your savings plan." : "Account created. Now add your chemicals."));
+    renderAccount(); applyAccount();
+    if (!prev && doc.role !== "buyer") location.hash = "dashboard";
+  }catch(ex){ err.textContent = writeErr(ex); btn.disabled = false; }
+});
+
+
+/* ---------- seller dashboard ---------- */
+const moneyShort = v => { const a = Math.abs(v), sg = v < 0 ? "-" : ""; return a >= 1e6 ? sg+"$"+(a/1e6).toFixed(a>=1e7?0:1)+"M" : a >= 1e3 ? sg+"$"+(a/1e3).toFixed(a>=1e4?0:1)+"k" : sg+"$"+Math.round(a); };
+let dashShare = null; // unsaved slider value, 0..1
+function sellerStats(a){
+  const D = a.disposal; const du = UNITS[D.unit];
+  const costPerBase = D.volume > 0 ? D.monthly / (D.volume * du.f) : 0;
+  const mine = threads.filter(t => t.sellerId === myId && t.deal);
+  const done = mine.filter(t => t.status === "complete"), open = mine.filter(t => t.status !== "complete");
+  let sold = 0, avoided = 0, soldBase = 0, soldBaseRev = 0, mismatch = 0;
+  const rows = done.map(t => { const d = t.deal, u = UNITS[d.unit]; sold += d.subtotal;
+    let av = null; if (u.dim === du.dim){ const base = d.qty * u.f; av = base * costPerBase; avoided += av; soldBase += base; soldBaseRev += d.subtotal; } else mismatch++;
+    return {t, d, av}; }).sort((x,y) => (y.t.updatedAt||0) - (x.t.updatedAt||0));
+  const pending = open.reduce((s,t) => s + t.deal.subtotal, 0);
+  const revPerBase = soldBase > 0 ? soldBaseRev / soldBase : null;
+  return {D, du, costPerBase, sold, avoided, pending, rows, open, revPerBase, mismatch};
+}
+function plan(st, share){
+  const D = st.D;
+  const mAvoid = D.monthly * share;
+  const mRev = st.revPerBase != null ? st.revPerBase * D.volume * st.du.f * share : 0;
+  const sq = [], wx = [];
+  for (let m = 0; m <= 24; m++){ sq.push(D.monthly * m); wx.push((D.monthly - mAvoid - mRev) * m); }
+  return {mAvoid, mRev, sq, wx, total: (mAvoid + mRev) * 24};
+}
+function niceStep(raw){ const p = Math.pow(10, Math.floor(Math.log10(raw || 1))); const f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+function drawPlan(box, sq, wx){
+  const W = Math.max(300, Math.round(box.clientWidth || 640)), H = 300, m = {l:58, r:14, t:14, b:30};
+  const all = [...sq, ...wx]; let lo = Math.min(0, ...all), hi = Math.max(1, ...all);
+  const step = niceStep((hi - lo) / 4); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const X = i => m.l + i * (W - m.l - m.r) / 24, Y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  let g = "";
+  for (let v = lo; v <= hi + 1e-9; v += step){ const y = Y(v).toFixed(1);
+    g += `<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="${Math.abs(v)<1e-9?1.5:1}"/><text x="${m.l-8}" y="${y}" dy="0.32em" text-anchor="end" fill="var(--muted)" font-size="11" font-family="var(--f-mono)">${moneyShort(v)}</text>`; }
+  [[0,"Now"],[6,"6 mo"],[12,"1 yr"],[18,"18 mo"],[24,"2 yr"]].forEach(([i,l]) => { g += `<text x="${X(i)}" y="${H-8}" text-anchor="${i===0?"start":i===24?"end":"middle"}" fill="var(--muted)" font-size="11" font-family="var(--f-mono)">${l}</text>`; });
+  const path = arr => arr.map((v,i) => (i?"L":"M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join(" ");
+  // direct end labels, nudged apart
+  let yS = Y(sq[24]) - 10, yW = Y(wx[24]) - 10; if (Math.abs(yS - yW) < 16){ if (yS <= yW) yW = yS + 16; else yS = yW + 16; }
+  const lbl = (y, t) => `<text x="${W-m.r}" y="${y.toFixed(1)}" text-anchor="end" fill="var(--ink)" font-size="12" font-weight="600">${t}</text>`;
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Cumulative disposal cost over 24 months: ${moneyShort(sq[24])} with disposal only, ${moneyShort(wx[24])} with WasteXchange">
+    ${g}
+    <path d="${path(sq)}" fill="none" stroke="var(--s-disp)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${path(wx)}" fill="none" stroke="var(--s-xchg)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${lbl(yS, "Disposal only " + moneyShort(sq[24]))}${lbl(yW, "With WasteXchange " + moneyShort(wx[24]))}
+    <g class="hover" visibility="hidden"><line class="hx" y1="${m.t}" y2="${H-m.b}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle class="hs" r="4.5" fill="var(--s-disp)" stroke="var(--surface)" stroke-width="2"/><circle class="hw" r="4.5" fill="var(--s-xchg)" stroke="var(--surface)" stroke-width="2"/></g>
+    <rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent" class="hit"/>
+  </svg><div class="tip" hidden></div>`;
+  const svg = box.querySelector("svg"), hov = svg.querySelector(".hover"), tip = box.querySelector(".tip");
+  const move = ev => { const r = svg.getBoundingClientRect(); const px = (ev.clientX - r.left) * (W / r.width);
+    const i = Math.max(0, Math.min(24, Math.round((px - m.l) / ((W - m.l - m.r) / 24))));
+    hov.setAttribute("visibility","visible"); hov.querySelector(".hx").setAttribute("x1", X(i)); hov.querySelector(".hx").setAttribute("x2", X(i));
+    hov.querySelector(".hs").setAttribute("cx", X(i)); hov.querySelector(".hs").setAttribute("cy", Y(sq[i])); hov.querySelector(".hw").setAttribute("cx", X(i)); hov.querySelector(".hw").setAttribute("cy", Y(wx[i]));
+    tip.innerHTML = `<strong>${i===0?"Today":"Month "+i}</strong><br>Disposal only: ${money(sq[i])}<br>With WasteXchange: ${money(wx[i])}<br><strong>Saved: ${money(sq[i]-wx[i])}</strong>`;
+    tip.hidden = false; const tx = X(i) * (r.width / W); tip.style.left = Math.min(Math.max(0, tx + 12), r.width - tip.offsetWidth) + "px"; tip.style.top = "8px"; };
+  const hit = svg.querySelector(".hit");
+  hit.addEventListener("pointermove", move); hit.addEventListener("pointerdown", move);
+  hit.addEventListener("pointerleave", () => { hov.setAttribute("visibility","hidden"); tip.hidden = true; });
+}
+function renderDashboard(){
+  const body = $("#dash-body"), a = myAccount();
+  if (!db){ body.innerHTML = emptyBox("The dashboard could not connect. Reload the page."); return; }
+  if (!myId){ body.innerHTML = loginBox("see your seller dashboard"); return; }
+  if (!loaded.a || !loaded.t){ body.innerHTML = emptyBox("Loading your dashboard..."); return; }
+  if (!a){ body.innerHTML = `<div class="empty"><strong style="color:var(--ink)">Create a seller account to see your savings.</strong><span>Tell us what you spend on disposal today and we will show what WasteXchange saves you over 2 years.</span><a class="btn small" href="#account">Create account</a></div>`; return; }
+  if (!sells(a)){ body.innerHTML = `<div class="empty"><strong style="color:var(--ink)">The savings dashboard is for sellers.</strong><span>Switch your account to seller and buyer to list surplus and track savings.</span><a class="btn small" href="#account">Edit account</a></div>`; return; }
+  if (!a.disposal){
+    if ($("#disp-form")) return; // keep what they are typing
+    $("#dash-title").textContent = a.company;
+    body.innerHTML = `<form class="post" id="disp-form" novalidate>
+      <fieldset><legend>Your disposal costs today</legend>
+        <p class="muted" style="font-size:13.5px;margin-top:-6px">Three numbers and your dashboard shows what you save with WasteXchange over 2 years.</p>
+        <div class="grid3">
+          <label for="dd-spend">Disposal spend per month (USD)<input id="dd-spend" type="number" min="0" step="1" inputmode="decimal" required><span class="hint">Hauling, landfill, incineration and treatment fees.</span></label>
+          <label for="dd-vol">Waste disposed per month<input id="dd-vol" type="number" min="0" step="any" inputmode="decimal" required></label>
+          <label for="dd-unit">Unit<select id="dd-unit">${Object.entries(UNITS).map(([k,v])=>`<option value="${k}"${k==="tons"?" selected":""}>${esc(v.label)}</option>`).join("")}</select></label>
+        </div>
+        <label for="dd-share" style="max-width:420px">Share of that waste another business could reuse (%)<input id="dd-share" type="number" min="1" max="100" step="1" inputmode="numeric" required><span class="hint">Your best estimate. You can adjust it later with the slider.</span></label>
+      </fieldset>
+      <div class="form-foot"><button class="btn" type="submit" id="dd-submit">Show my savings plan</button><span class="err" id="dd-err" role="alert"></span></div>
+    </form>`;
+    return;
+  }
+  $("#dash-title").textContent = a.company;
+  const st = sellerStats(a); const share = dashShare ?? a.disposal.share; const p = plan(st, share);
+  const D = a.disposal, du = st.du;
+  const yr = y => { const m = 12; return {status: D.monthly*m, still: (D.monthly - p.mAvoid)*m, rev: p.mRev*m, net: (p.mAvoid + p.mRev)*m}; };
+  const y1 = yr(1), y2 = yr(2);
+  body.innerHTML = `
+    <div class="tiles">
+      <div class="tile"><span class="lbl">Sold on WasteXchange</span><span class="val">${money(st.sold)}</span><span class="sub">${st.rows.length} completed exchange${st.rows.length===1?"":"s"}${st.pending?` · ${money(st.pending)} agreed and in progress`:""}</span></div>
+      <div class="tile"><span class="lbl">Disposal avoided</span><span class="val">${money(st.avoided)}</span><span class="sub">At your cost of ${money(st.costPerBase*du.f,true)}/${esc(du.short)} to dispose${st.mismatch?` · ${st.mismatch} sale${st.mismatch>1?"s":""} in other units not counted`:""}</span></div>
+      <div class="tile"><span class="lbl">Saved to date</span><span class="val">${money(st.sold + st.avoided)}</span><span class="sub">Sales plus disposal avoided. Seller fees paid: $0.</span></div>
+      <div class="tile tile-hero"><span class="lbl">Projected 2-year savings</span><span class="val">${money(p.total)}</span><span class="sub">${money(p.mAvoid + p.mRev)} per month at ${Math.round(share*100)}% of your waste reused</span></div>
+    </div>
+    ${!st.rows.length && !st.open.length ? `<div class="empty" style="margin-top:12px"><span>No sales yet, so your saved-to-date figures start at $0. List the chemicals you have in surplus to start.</span><a class="btn small" href="#sell">Add a chemical you sell</a></div>` : ""}
+    <div class="dash-sec"><div class="col-head"><h3>Your 2-year plan with WasteXchange</h3></div>
+      <div class="plan">
+        <div class="panel"><div class="legend"><span><i style="background:var(--s-disp)"></i>Disposal only, today's cost</span><span><i style="background:var(--s-xchg)"></i>With WasteXchange</span></div>
+          <div class="chart-box" id="plan-chart"></div>
+          <p class="muted" style="font-size:12.5px;margin-top:8px">Cumulative cost over 24 months. Below $0 means WasteXchange sales more than cover what you still pay to dispose.</p></div>
+        <div class="panel" style="display:grid;gap:14px">
+          <label for="d-share">Share of your waste reused: <span class="mono" id="d-share-v">${Math.round(share*100)}%</span><input id="d-share" type="range" min="0" max="100" step="1" value="${Math.round(share*100)}"></label>
+          ${dashShare!=null && Math.round(dashShare*100)!==Math.round(D.share*100) ? `<button class="btn small" id="d-share-save">Save ${Math.round(dashShare*100)}% as my estimate</button>` : ""}
+          <table class="ledger">
+            <tr><td>Disposal spend today</td><td>${money(D.monthly)}/mo</td></tr>
+            <tr><td>Waste disposed</td><td>${esc(num(D.volume))} ${esc(du.short)}/mo</td></tr>
+            <tr><td>Disposal avoided</td><td>${money(p.mAvoid)}/mo</td></tr>
+            <tr><td>Sales revenue</td><td>${st.revPerBase!=null?money(p.mRev)+"/mo":"After first sale"}</td></tr>
+            <tr class="total"><td>Monthly savings</td><td>${money(p.mAvoid+p.mRev)}</td></tr>
+          </table>
+          <p class="muted" style="font-size:12.5px">${st.revPerBase!=null?`Sales revenue uses your average realized price of ${money(st.revPerBase*du.f,true)}/${esc(du.short)} from completed exchanges.`:`Sales revenue is added once you complete your first exchange, using the price you actually get. Until then the plan counts disposal avoided only.`}</p>
+        </div>
+      </div>
+      <div style="overflow-x:auto;margin-top:16px"><table class="datatable">
+        <thead><tr><th></th><th class="n">Disposal only</th><th class="n">Still paid for disposal</th><th class="n">Sales revenue</th><th class="n">Savings</th></tr></thead>
+        <tbody><tr><td>Year 1</td><td class="n">${money(y1.status)}</td><td class="n">${money(y1.still)}</td><td class="n">${money(y1.rev)}</td><td class="n"><strong>${money(y1.net)}</strong></td></tr>
+        <tr><td>Year 2</td><td class="n">${money(y2.status)}</td><td class="n">${money(y2.still)}</td><td class="n">${money(y2.rev)}</td><td class="n"><strong>${money(y2.net)}</strong></td></tr>
+        <tr><td><strong>2 years</strong></td><td class="n">${money(y1.status*2)}</td><td class="n">${money(y1.still*2)}</td><td class="n">${money(y1.rev*2)}</td><td class="n"><strong>${money(p.total)}</strong></td></tr></tbody></table></div>
+    </div>
+    <div class="dash-sec"><div class="col-head"><h3>Completed sales</h3><span class="mono muted">${st.rows.length}</span></div>
+      ${st.rows.length ? `<div style="overflow-x:auto"><table class="datatable"><thead><tr><th>Completed</th><th>Buyer</th><th>Chemical</th><th class="n">Quantity</th><th class="n">You received</th><th class="n">Disposal avoided</th></tr></thead><tbody>
+        ${st.rows.map(r => `<tr><td>${new Date(r.t.updatedAt||r.d.agreedAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</td><td>${esc(r.t.buyerCo)}</td><td>${esc(r.t.material)}</td><td class="n">${esc(qtyText(r.d.qty,r.d.unit))}</td><td class="n">${money(r.d.subtotal,true)}</td><td class="n">${r.av==null?"Different unit":money(r.av,true)}</td></tr>`).join("")}
+      </tbody></table></div>` : `<div class="empty"><span>Completed exchanges appear here with what you received and the disposal cost you avoided.</span></div>`}
+    </div>`;
+  const box = $("#plan-chart"); requestAnimationFrame(() => drawPlan(box, p.sq, p.wx));
+}
+document.addEventListener("input", e => {
+  if (e.target.id !== "d-share") return;
+  dashShare = Number(e.target.value) / 100; const a = myAccount(); if (!a?.disposal) return;
+  const st = sellerStats(a), p = plan(st, dashShare);
+  $("#d-share-v").textContent = Math.round(dashShare*100) + "%";
+  clearTimeout(renderDashboard._t); renderDashboard._t = setTimeout(() => { const y = window.scrollY; renderDashboard(); window.scrollTo(0, y); $("#d-share")?.focus(); }, 120);
+  drawPlan($("#plan-chart"), p.sq, p.wx);
+});
+document.addEventListener("submit", async e => {
+  if (e.target.id !== "disp-form") return;
+  e.preventDefault(); const err = $("#dd-err"); err.textContent = "";
+  const a = myAccount(); if (!a) return;
+  const sp = $("#dd-spend").value, vo = Number($("#dd-vol").value), sh = Number($("#dd-share").value);
+  if (sp === "" || !(Number(sp) >= 0) || !(vo > 0) || !(sh >= 1 && sh <= 100)){ err.textContent = "Enter your monthly disposal spend, how much waste you dispose of each month, and the share you think could be reused (1 to 100)."; return; }
+  const disposal = {monthly:Number(sp), volume:vo, unit:$("#dd-unit").value, share:sh/100};
+  const btn = $("#dd-submit"); btn.disabled = true;
+  try { await db.doc("accounts/"+myId).update({disposal, updatedAt:Date.now()}); accounts = {...accounts, [myId]: {...a, disposal}}; toast("Savings plan ready"); $("#dash-body").innerHTML = ""; renderDashboard(); }
+  catch(ex){ err.textContent = writeErr(ex); btn.disabled = false; }
+});
+document.addEventListener("click", async e => {
+  if (!e.target.closest("#d-share-save")) return;
+  const a = myAccount(); if (!a || dashShare == null) return;
+  try { await db.doc("accounts/"+myId).update({disposal:{...a.disposal, share:dashShare}, updatedAt:Date.now()}); accounts[myId] = {...a, disposal:{...a.disposal, share:dashShare}}; dashShare = null; toast("Estimate saved"); renderDashboard(); }
+  catch(err){ toast(writeErr(err)); }
+});
+let dashResize = null;
+window.addEventListener("resize", () => { clearTimeout(dashResize); dashResize = setTimeout(() => { if (!$("#v-dashboard").hidden && $("#plan-chart")) renderDashboard(); }, 150); });
+
+/* ---------- login ---------- */
+let authMode = "in";
+function setAuthMode(m){
+  authMode = m;
+  document.querySelectorAll("[data-auth]").forEach(b => b.setAttribute("aria-pressed", b.dataset.auth===m));
+  $("#login-title").textContent = m==="in" ? "Log in to WasteXchange" : "Create your WasteXchange login";
+  $("#l-submit").textContent = m==="in" ? "Log in" : "Create login";
+  $("#l-pass").setAttribute("autocomplete", m==="in" ? "current-password" : "new-password");
+  $("#l-err").textContent = ""; $("#l-msg").hidden = true;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-auth]"); if (b){ setAuthMode(b.dataset.auth); return; }
+  const out = e.target.closest("#nav-auth[data-out]"); if (out){ e.preventDefault(); window.WX?.signOut(); }
+});
+document.addEventListener("submit", async e => {
+  if (e.target.id !== "login-form") return;
+  e.preventDefault();
+  const err = $("#l-err"), msg = $("#l-msg"); err.textContent = ""; msg.hidden = true;
+  const email = $("#l-email").value.trim(), pw = $("#l-pass").value;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ err.textContent = "Enter a valid email address."; return; }
+  if (pw.length < 8){ err.textContent = "Passwords need at least 8 characters."; return; }
+  const btn = $("#l-submit"); btn.disabled = true;
+  try {
+    if (authMode === "up"){
+      const r = await window.WX.signUp(email, pw);
+      if (r.error){ err.textContent = /registered|exists/i.test(r.error.message) ? "That email already has a login. Switch to Log in." : r.error.message; return; }
+      if (!r.data.session){ msg.textContent = "Check your inbox to confirm your email, then come back and log in."; msg.hidden = false; setAuthMode("in"); msg.hidden = false; }
+    } else {
+      const r = await window.WX.signIn(email, pw);
+      if (r.error){ err.textContent = /confirm/i.test(r.error.message) ? "Confirm your email first. Check your inbox for the link." : "That email and password do not match a login."; return; }
+    }
+  } catch(ex){ err.textContent = "Could not reach WasteXchange. Check your connection and try again."; }
+  finally { btn.disabled = false; }
+});
+function setupAuthNav(){
+  const a = $("#nav-auth");
+  if (myId){ a.textContent = "Log out"; a.setAttribute("href", "#home"); a.dataset.out = "1"; a.removeAttribute("data-nav");
+    if ((location.hash||"") === "#login") location.hash = myAccount() ? "dashboard" : "account"; }
+}
+
+/* ---------- data wiring ---------- */
+function rerender(){ updateCount(); applyAccount(); if (!$("#v-account").hidden) renderAccount(); if (!$("#v-dashboard").hidden) renderDashboard(); if (!$("#v-sell").hidden || !$("#v-buy").hidden) renderGates(); if (!$("#v-market").hidden) renderMarket(); if (!$("#v-deals").hidden) renderDeals(); }
+function watch(path, order, key, setter){
+  const timer = setTimeout(()=>{ if(!loaded[key]) banner("The marketplace data cannot be reached right now. What you see may be out of date."); }, 10000);
+  db.collection(path).orderBy(order,"desc").limit(300).onSnapshot(snap => {
+    setter(snap.docs.map(d=>({id:d.id, ...d.data()})));
+    if (!snap.metadata.fromCache){ loaded[key]=true; clearTimeout(timer); }
+    else loaded[key] = loaded[key] || snap.size>0;
+    rerender();
+  }, err => { clearTimeout(timer); loaded[key]=true; banner("Live marketplace data stopped updating. Reload the page to reconnect."); rerender(); });
+}
+async function boot(){
+  route();
+  if (!window.claude?.use){ banner("The marketplace could not load. Reload the page."); return; }
+  try { user = await window.claude.use("user"); } catch {}
+  if (user){ try{ myId = await user.id(); isOwner = await user.isOwner(); canWrite = await user.can("data.write"); }catch{} }
+  try { db = await window.claude.use("db"); } catch {}
+  if (!db){ banner("The marketplace could not connect. Reload the page."); rerender(); return; }
+  setupAuthNav();
+  watch("listings","createdAt","l", v=>listings=v);
+  watch("requests","createdAt","r", v=>requests=v);
+  watch("threads","updatedAt","t", v=>threads=v);
+  watch("accounts","updatedAt","a", v=>{ accounts = Object.fromEntries(v.map(x=>[x.id,x])); });
+  rerender();
+}
+boot();
+})();
+</script>
+</body>
+</html>
